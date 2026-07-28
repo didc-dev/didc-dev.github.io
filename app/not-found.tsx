@@ -1,0 +1,2 @@
+import Link from "next/link";
+export default function NotFound() { return <section className="not-found section-shell"><p className="eyebrow">Erreur 404</p><h1>Cette page n’existe pas.</h1><p>Le chemin a peut-être changé. Revenez à l’accueil ou explorez les réalisations.</p><div className="actions"><Link className="button primary" href="/">Retour à l’accueil</Link><Link className="button ghost" href="/realisations/">Voir les réalisations</Link></div></section>; }

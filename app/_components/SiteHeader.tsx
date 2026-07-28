@@ -1,0 +1,5 @@
+"use client";
+import Link from "next/link";
+import { useState } from "react";
+const links = [["/", "Accueil"], ["/parcours/", "Parcours"], ["/metiers/", "Métiers"], ["/realisations/", "Réalisations"], ["/formations/", "Formations"], ["/blog/", "Blog technique"], ["/contact/", "Contact"]];
+export function SiteHeader() { const [open, setOpen] = useState(false); return <header className="site-header"><div className="nav-shell"><Link className="brand" href="/" onClick={() => setOpen(false)} aria-label="Daniel Cruz — accueil"><span className="brand-mark">DC</span><span><strong>Daniel Cruz</strong><small>Infrastructures & support IT</small></span></Link><button className="menu-button" aria-expanded={open} aria-controls="main-nav" onClick={() => setOpen(!open)}><span className="sr-only">Menu principal</span><i /><i /><i /></button><nav id="main-nav" className={open ? "nav-links open" : "nav-links"} aria-label="Navigation principale">{links.map(([href, label]) => <Link key={href} href={href} onClick={() => setOpen(false)}>{label}</Link>)}</nav></div></header>; }

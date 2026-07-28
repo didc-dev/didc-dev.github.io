@@ -1,0 +1,21 @@
+{
+  "generatedAt": "2026-07-28",
+  "projects": [
+    {
+      "slug": "active-directory-cruzlab",
+      "status": "published"
+    },
+    {
+      "slug": "laboratoire-proxmox-ve",
+      "status": "published"
+    },
+    {
+      "slug": "poste-windows-11",
+      "status": "published"
+    },
+    {
+      "slug": "raspberry-pi-services",
+      "status": "published"
+    }
+  ]
+}
