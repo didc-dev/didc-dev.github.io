@@ -16,7 +16,13 @@ export default function Home() {
         <p className="hero-note">Mon expérience m’a appris à analyser, anticiper les contraintes, documenter les décisions et rechercher des solutions fiables. J’approfondis aujourd’hui les systèmes, les réseaux et le support IT par une pratique régulière.</p>
         <div className="actions"><Link className="button primary" href="/parcours/">Découvrir mon parcours</Link><Link className="button ghost" href="/realisations/">Voir mes réalisations</Link></div>
       </div>
-      <div className="portrait-wrap"><div className="portrait-halo" aria-hidden="true" /><Image className="portrait" src={assetPath("/images/daniel-cruz.jpg")} width={560} height={560} priority unoptimized alt="Portrait professionnel de Daniel Cruz" /><div className="availability"><span />Basé en Suisse romande</div></div>
+      <div className="portrait-wrap">
+        <div className="portrait-frame"><div className="portrait-halo" aria-hidden="true" /><Image className="portrait" src={assetPath("/images/daniel-cruz.jpg")} width={560} height={560} priority unoptimized alt="Portrait professionnel de Daniel Cruz" /></div>
+        <div className="portrait-meta">
+          <div className="availability"><span />Basé en Suisse romande</div>
+          <p><strong>Poste actuel</strong><span>Technicien en infrastructures industrielles / planificateur-électricien</span><small>Connect Groupe E · depuis 2024</small></p>
+        </div>
+      </div>
     </section>
 
     <section className="section section-shell" aria-labelledby="pillars-title">
