@@ -56,6 +56,33 @@ test("les images publiques possèdent un texte alternatif", async () => {
   for (const page of await Promise.all(mainRoutes.map(html))) for (const match of page.matchAll(/<img\b[^>]*>/g)) assert.match(match[0], /\balt="[^"]+"/);
 });
 
+test("chaque note publiée possède un visuel dédié et unique", async () => {
+  const images = await source("app/_data/images.ts");
+  const mapBlock = images.match(/export const noteImageKeys[\s\S]*?= \{([\s\S]*?)\n\};/);
+  assert.ok(mapBlock, "La table noteImageKeys doit exister");
+
+  const entries = [...mapBlock[1].matchAll(/"([^"]+)":\s*"([^"]+)"/g)].map((match) => ({ slug: match[1], imageKey: match[2] }));
+  assert.deepEqual(entries.map(({ slug }) => slug).sort(), [...noteSlugs].sort());
+  assert.equal(new Set(entries.map(({ imageKey }) => imageKey)).size, noteSlugs.length, "Chaque note doit utiliser un visuel différent");
+});
+
+test("toutes les variantes responsive des nouveaux visuels existent", async () => {
+  const bases = [
+    "article_active_directory_role_general", "article_agdlp_explique_simplement", "article_dhcp_configuration_reseau",
+    "article_diagnostic_reseau_premiere_methode", "article_documenter_une_modification", "article_hyperviseur_role",
+    "article_ip_masque_passerelle_dns", "article_proxmox_hyperv_virtualbox", "article_raspberry_pi_petit_serveur",
+    "article_snapshot_sauvegarde_retour", "article_tgbt_role_general", "article_wifi_ou_zigbee",
+  ];
+  for (const base of bases) {
+    for (const width of [480, 800, 1200, 1672]) {
+      for (const format of ["avif", "webp"]) await access(new URL(`public/images/portfolio/articles/${base}-${width}.${format}`, root));
+    }
+  }
+  for (const width of [480, 800, 1200, 1800]) {
+    for (const format of ["avif", "webp"]) await access(new URL(`public/images/portfolio/timeline/timeline_2017_2021_installation_electrique-${width}.${format}`, root));
+  }
+});
+
 test("les protections responsive et mouvement réduit sont présentes", async () => {
   const css = await source("app/globals.css");
   assert.match(css, /overflow-x:clip/);

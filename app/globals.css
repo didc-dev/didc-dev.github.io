@@ -130,7 +130,7 @@ picture>img { display:block; width:100%; height:100%; }
 .trade-copy { padding:2.4rem 3rem 3rem; }
 .timeline-content summary { list-style:none; cursor:pointer; }
 .timeline-content summary::-webkit-details-marker { display:none; }
-.timeline-image { overflow:hidden; aspect-ratio:2.25; margin-bottom:1.3rem; border-radius:16px; background:var(--teal); }
+.timeline-image { overflow:hidden; aspect-ratio:16 / 9; margin-bottom:1.3rem; border-radius:16px; background:var(--teal); }
 .timeline-image img { object-fit:cover; }
 .pillar-mini-image { aspect-ratio:2.2; overflow:hidden; background:var(--teal); }
 .formation-list details { overflow:hidden; }
