@@ -11,8 +11,8 @@ export default function Home() {
       <div className="hero-copy">
         <p className="eyebrow">Infrastructures industrielles · Planification électrique · Technologies IT</p>
         <h1 id="hero-title">Daniel Cruz</h1>
-        <p className="hero-lead">Technicien en infrastructures industrielles et planificateur-électricien CFC, je construis mon parcours à la rencontre du terrain, de la coordination et des systèmes informatiques.</p>
-        <p className="hero-note">Mon expérience m’a appris à analyser, anticiper les contraintes, documenter les décisions et rechercher des solutions fiables. J’approfondis aujourd’hui les systèmes, les réseaux et le support IT par une pratique régulière.</p>
+        <p className="hero-lead">Mon parcours s’est construit entre le terrain, la planification, les infrastructures et l’informatique.</p>
+        <p className="hero-note">Ce site rassemble les projets, les expériences et les sujets techniques qui m’accompagnent, tout en gardant une trace claire de ce que j’apprends au fil du temps.</p>
         <div className="actions"><Link className="button primary" href="/parcours/">Découvrir mon parcours</Link><Link className="button ghost" href="/realisations/">Voir mes réalisations</Link></div>
       </div>
       <HeroPortraitCard />
@@ -27,8 +27,8 @@ export default function Home() {
 
     <section className="section journey-band" aria-labelledby="journey-title"><div className="section-shell"><div className="section-heading"><p className="eyebrow">Parcours résumé</p><h2 id="journey-title">Une évolution technique continue</h2></div><ol className="journey-flow">{[...experiences].reverse().map((item) => <li key={`${item.period}-${item.role}`}><span>{item.period}</span><strong>{item.domain}</strong><small>{item.role}</small></li>)}</ol><Link className="button ghost light" href="/parcours/">Voir le parcours complet</Link></div></section>
 
-    <section className="section section-shell formation-preview" aria-labelledby="formation-title"><div><p className="eyebrow">Formation & progression</p><h2 id="formation-title">Des qualifications de terrain, complétées par la pratique IT</h2><p>Deux CFC terminés, une formation informatique initiale et un laboratoire personnel consacré aux systèmes et aux réseaux.</p><Link className="button ghost" href="/formations/">Consulter les formations</Link></div><div className="qualification-stack">{formations.map((item) => <article key={item.title}><span>{item.status}</span><strong>{item.title}</strong><small>{item.period}</small></article>)}</div></section>
+    <section className="section section-shell formation-preview" aria-labelledby="formation-title"><div><p className="eyebrow">Formation & progression</p><h2 id="formation-title">Des qualifications de terrain, complétées par la pratique IT</h2><p>Deux CFC obtenus en Suisse, un diplôme professionnel informatique portugais reconnu par le SEFRI au niveau CFC, et un laboratoire personnel consacré aux systèmes et aux réseaux.</p><Link className="button ghost" href="/formations/">Consulter les formations</Link></div><div className="qualification-stack">{formations.map((item) => <article key={item.title}><span>{item.status}</span><strong>{item.title}</strong><small>{item.period}</small></article>)}</div></section>
 
-    <section className="cta section-shell"><div><p className="eyebrow">Opportunités professionnelles</p><h2>Vous recherchez un profil technique polyvalent?</h2><p>Échangeons sur un environnement où le terrain, la planification et les technologies se rencontrent.</p></div><Link className="button primary" href="/contact/">Prendre contact</Link></section>
+    <section className="cta section-shell"><div><p className="eyebrow">Au fil du temps</p><h2>Un site qui évolue avec mes projets</h2><p>J’ajouterai progressivement de nouvelles réalisations, des notes techniques et les étapes de mes apprentissages.</p></div><div className="actions"><Link className="button primary" href="/blog/">Explorer mes notes</Link><Link className="button ghost light" href="/realisations/">Découvrir mes projets</Link></div></section>
   </>;
 }
