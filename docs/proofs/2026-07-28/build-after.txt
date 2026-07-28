@@ -1,0 +1,16 @@
+Construction de production — 28 juillet 2026
+
+Commande : npm test
+Résultat : RÉUSSI
+
+Next.js a compilé l'application, vérifié TypeScript et généré 20 routes
+statiques. Les pages principales, les détails des réalisations et les articles
+ont été pré-rendus sans erreur.
+
+Routes principales vérifiées :
+- /
+- /parcours
+- /realisations
+- /formations
+- /blog
+- /contact

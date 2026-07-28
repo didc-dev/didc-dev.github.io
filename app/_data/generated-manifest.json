@@ -6,11 +6,27 @@
       "status": "published"
     },
     {
+      "slug": "diagnostic-informatique",
+      "status": "published"
+    },
+    {
+      "slug": "domotique-maison",
+      "status": "published"
+    },
+    {
+      "slug": "fibre-optique-tests",
+      "status": "published"
+    },
+    {
+      "slug": "infrastructures-industrielles",
+      "status": "published"
+    },
+    {
       "slug": "laboratoire-proxmox-ve",
       "status": "published"
     },
     {
-      "slug": "poste-windows-11",
+      "slug": "planification-electrique",
       "status": "published"
     },
     {

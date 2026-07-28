@@ -1,7 +1,7 @@
 # Audit CV et repositionnement éditorial
 
-Date de l'audit: 28 juillet 2026  
-Source principale: `Inácio_da_Cruz_Daniel_CV-2025 (1).pdf`, 2 pages  
+Date de l'audit: 28 juillet 2026
+Source principale: `Inácio_da_Cruz_Daniel_CV-2025 (1).pdf`, 2 pages
 Sources complémentaires: contenu actuel du portfolio et faits communiqués directement par Daniel Cruz
 
 ## Synthèse

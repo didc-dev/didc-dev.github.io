@@ -1,0 +1,15 @@
+Validation finale du portfolio — 28 juillet 2026
+
+npm run typecheck : RÉUSSI
+npm run lint      : RÉUSSI
+npm test          : RÉUSSI
+
+Résultat des tests :
+- 7 tests exécutés
+- 7 tests réussis
+- 0 échec
+- 20 routes statiques générées
+
+Les contrôles couvrent notamment les routes publiques, les trois piliers,
+les huit réalisations publiées, les quatre articles, les brouillons privés,
+le permis de conduire et les textes alternatifs des images.

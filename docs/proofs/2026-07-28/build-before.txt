@@ -1,0 +1,5 @@
+Baseline avant refonte
+Date: 2026-07-28
+Commande attendue: npm run build
+État connu: le dépôt public précédent était déployé et répondait HTTP 200.
+Limite de preuve: la sortie brute du build de référence n'a pas été conservée avant les modifications; ce fichier le signale explicitement au lieu d'inventer un résultat.
