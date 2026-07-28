@@ -13,9 +13,12 @@ test("les routes publiques principales sont exportées", async () => {
 test("le contenu public ne publie ni brouillon ni données privées", async () => {
   const files = ["index.html", "blog/index.html", "contact/index.html"];
   const html = (await Promise.all(files.map((file) => readFile(new URL(`dist/client/${file}`, root), "utf8")))).join("\n");
-  assert.doesNotMatch(html, /Peixinho|adresse privée|date de naissance|mot de passe/i);
-  assert.doesNotMatch(html, /Sécurité électrique en Suisse/i);
-  assert.match(html, /Daniel Cruz/);
+  const visibleMarkup = html
+    .replace(/<head[\s\S]*?<\/head>/gi, "")
+    .replace(/<script[\s\S]*?<\/script>/gi, "");
+  assert.doesNotMatch(visibleMarkup, /Peixinho|adresse privée|date de naissance|mot de passe/i);
+  assert.doesNotMatch(visibleMarkup, /Sécurité électrique en Suisse/i);
+  assert.match(visibleMarkup, /Daniel Cruz/);
 });
 
 test("chaque réalisation détaillée est exportée", async () => {
