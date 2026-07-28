@@ -1,6 +1,6 @@
 # Portfolio public de Daniel Cruz
 
-Portfolio professionnel statique en français de Suisse. Il présente un parcours entre infrastructures techniques, support informatique, systèmes Microsoft et virtualisation.
+Portfolio professionnel statique en français de Suisse. Il présente trois piliers équilibrés: infrastructures et électricité, planification et coordination, informatique et systèmes.
 
 ## Développement
 
@@ -25,6 +25,7 @@ npm test
 - `content/projects/`: sources éditoriales des études de cas.
 - `app/_data/content.ts`: données structurées actuellement rendues.
 - `docs/`: architecture, procédures éditoriales et preuves.
+- `content/media-manifest.json`: origine et classification des visuels publics.
 
 Les brouillons, secrets, adresses privées, fichiers du laboratoire privé et classeur de suivi ne sont jamais publiés.
 

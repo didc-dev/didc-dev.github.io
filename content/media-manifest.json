@@ -1,0 +1,26 @@
+{
+  "media": [
+    {
+      "file": "public/images/daniel-cruz.jpg",
+      "title": "Portrait professionnel de Daniel Cruz",
+      "description": "Portrait extrait du CV fourni par Daniel Cruz.",
+      "alt": "Portrait professionnel de Daniel Cruz",
+      "domain": "Profil",
+      "imageType": "real-photo",
+      "origin": "CV fourni par le propriétaire",
+      "public": true,
+      "project": null
+    },
+    {
+      "file": "app/_components/DomainArt.tsx",
+      "title": "Bibliothèque d’illustrations techniques",
+      "description": "Schémas CSS pour terrain, planification et informatique.",
+      "alt": "Défini selon le domaine affiché",
+      "domain": "Transversal",
+      "imageType": "technical-illustration",
+      "origin": "Création originale pour le portfolio",
+      "public": true,
+      "project": null
+    }
+  ]
+}

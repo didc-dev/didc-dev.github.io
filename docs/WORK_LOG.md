@@ -22,3 +22,11 @@ Un socle Sites vide existait dans un nouveau dépôt. Le projet privé LabNotes 
 ### Validation
 
 Les résultats de lint, typecheck, tests, build, contrôles visuels et publication sont consignés dans `docs/proofs/2026-07-28/` au terme de l’intervention.
+
+## 28 juillet 2026 — Refonte transversale
+
+- Repositionnement autour de trois piliers équilibrés: terrain, planification et informatique.
+- Ajout d’expériences de terrain, planification, fibre, diagnostic, domotique et laboratoires avec types explicites.
+- Intégration autorisée du permis B, des loisirs et des drones sans inventer le modèle non confirmé.
+- Ajout d’illustrations techniques HTML/CSS, de filtres, d’une navigation active et de données structurées.
+- Enrichissement du parcours, des formations, du blog et des études de cas.

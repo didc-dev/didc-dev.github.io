@@ -20,3 +20,7 @@ Lire `docs/WORK_LOG.md`, le dernier dossier `docs/proofs/`, `git status`, puis l
 ## Ajouter un agent
 
 Créer un fichier TOML dans `.codex/agents/` avec rôle, mission, périmètre, entrées, livrables, limites, critères de qualité, vérifications et collaborations. Ajouter une preuve de sa revue avant de lui confier une publication.
+
+## Spécialistes disponibles
+
+Le registre couvre notamment l'audit du portfolio, l'analyse du CV, la rédaction professionnelle en fr-CH, la conception de visuels techniques, la vérification factuelle et le contrôle de publication. Les agents produisent des recommandations; le CEO reste responsable de leur intégration et de la décision finale.

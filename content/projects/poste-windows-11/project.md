@@ -1,6 +1,6 @@
 ---
 slug: poste-windows-11
-status: published
+status: archived
 ---
 # Poste client Windows 11
 
