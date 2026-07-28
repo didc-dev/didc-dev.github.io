@@ -1,0 +1,6 @@
+Branche: main
+Dépôt distant: aucun
+Historique: aucun commit
+État: socle Sites non suivi (fichiers générés par init-site.sh)
+
+Le projet source LabNotes a été audité séparément et volontairement laissé intact.

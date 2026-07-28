@@ -1,0 +1,3 @@
+Commande: npm run dev
+Résultat initial: échec sous Windows, car la syntaxe POSIX d’affectation de WRANGLER_LOG_PATH n’est pas comprise par PowerShell/cmd.
+Correction prévue: scripts npm multiplateformes; les variables sont déjà initialisées dans vite.config.ts.
