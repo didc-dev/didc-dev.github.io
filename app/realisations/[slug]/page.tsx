@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { projects } from "../../_data/content";
-import { DomainArt } from "../../_components/DomainArt";
+import { ResponsiveImage } from "../../_components/ResponsiveImage";
+import { projectImageKeys } from "../../_data/images";
 
 export function generateStaticParams() {
   return projects.map((project) => ({ slug: project.slug }));
@@ -23,7 +24,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           <p>{project.summary}</p>
           <div className="tags large">{project.skills.map((skill) => <span key={skill}>{skill}</span>)}</div>
         </div>
-        <DomainArt pillar={project.pillar} />
+        <ResponsiveImage imageKey={projectImageKeys[project.slug]} className="project-hero-image" sizes="(max-width: 980px) 100vw, 50vw" eager />
       </section>
       <section className="case-study section-shell">
         <aside>

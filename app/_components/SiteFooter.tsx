@@ -1,2 +1,39 @@
 import Link from "next/link";
-export function SiteFooter() { return <footer className="site-footer"><div className="section-shell footer-grid"><div><strong>Daniel Cruz</strong><p>Un espace personnel consacré à mon parcours, mes projets et mes apprentissages techniques.</p></div><div><p className="footer-label">Navigation</p><Link href="/realisations/">Réalisations</Link><Link href="/blog/">Carnet technique</Link><Link href="/parcours/">Parcours</Link><Link href="/contact/">Contact</Link></div><div><p className="footer-label">Repères</p><p>Suisse romande<br />Permis de conduire B</p></div></div><div className="section-shell content-disclosure"><p>Les contenus sont identifiés comme expériences professionnelles, projets personnels ou laboratoires d’apprentissage. Les illustrations techniques expliquent les sujets lorsqu’aucune photographie ne peut être publiée.</p></div><div className="section-shell footer-bottom"><span>© {new Date().getFullYear()} Daniel Cruz</span><span>Un site qui évolue avec ce que je construis et ce que j’apprends.</span></div></footer>; }
+import { ResponsiveImage } from "./ResponsiveImage";
+
+export function SiteFooter() {
+  return (
+    <footer className="site-footer">
+      <ResponsiveImage
+        imageKey="footer"
+        className="footer-panorama"
+        sizes="100vw"
+        alt="Paysage suisse au crépuscule avec une trame de réseau discrète"
+      />
+      <div className="section-shell footer-grid">
+        <div>
+          <strong>Daniel Cruz</strong>
+          <p>Un espace personnel consacré à mon parcours, mes projets et mes apprentissages techniques.</p>
+        </div>
+        <div>
+          <p className="footer-label">Navigation</p>
+          <Link href="/realisations/">Réalisations</Link>
+          <Link href="/blog/">Carnet technique</Link>
+          <Link href="/parcours/">Parcours</Link>
+          <Link href="/contact/">Contact</Link>
+        </div>
+        <div>
+          <p className="footer-label">Repères</p>
+          <p>Suisse romande<br />Permis de conduire B</p>
+        </div>
+      </div>
+      <div className="section-shell content-disclosure">
+        <p>Les contenus sont identifiés comme expériences professionnelles, projets personnels ou laboratoires d’apprentissage. Les illustrations techniques expliquent les sujets lorsqu’aucune photographie ne peut être publiée.</p>
+      </div>
+      <div className="section-shell footer-bottom">
+        <span>© {new Date().getFullYear()} Daniel Cruz</span>
+        <span>Un site qui évolue avec ce que je construis et ce que j’apprends.</span>
+      </div>
+    </footer>
+  );
+}

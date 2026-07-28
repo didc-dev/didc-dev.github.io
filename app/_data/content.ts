@@ -50,7 +50,8 @@ export const formations = [
 export const experiences = [
   { period: "2024–aujourd’hui", role: "Technicien en infrastructures industrielles / planificateur-électricien", company: "Connect Groupe E", domain: "Infrastructures" },
   { period: "2023", role: "Chef de projet et planificateur-électricien", company: "RBM Électricité", domain: "Planification" },
-  { period: "2017–2023", role: "Technicien en électronique, installateur puis planificateur-électricien", company: "Missions et formations en Suisse romande", domain: "Terrain & évolution" },
+  { period: "2021–2023", role: "Formation de planificateur-électricien CFC", company: "Connect Groupe E", domain: "Planification & coordination" },
+  { period: "2017–2021", role: "Formation d’installateur-électricien CFC", company: "Connect Groupe E", domain: "Terrain & installation" },
   { period: "2013–2015", role: "Informaticien puis dépannage de systèmes informatiques", company: "Toshiba Portugal et mission en Suisse", domain: "Informatique" },
   { period: "2010–2013", role: "Formation en gestion des équipements informatiques", company: "INETE, Lisbonne", domain: "Fondations IT" },
 ];

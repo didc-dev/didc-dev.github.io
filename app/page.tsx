@@ -1,13 +1,15 @@
 import Link from "next/link";
 import { experiences, formations, pillars, projects } from "./_data/content";
 import { ProjectCard } from "./_components/ProjectCard";
-import { DomainArt } from "./_components/DomainArt";
 import { HeroPortraitCard } from "./_components/HeroPortraitCard";
+import { ResponsiveImage } from "./_components/ResponsiveImage";
+import { pillarImageKeys } from "./_data/images";
 
 export default function Home() {
   const selected = ["infrastructures-industrielles", "planification-electrique", "laboratoire-proxmox-ve"].map((slug) => projects.find((project) => project.slug === slug)!);
   return <>
     <section className="hero section-shell" aria-labelledby="hero-title">
+      <ResponsiveImage imageKey="header" className="hero-panorama" sizes="100vw" eager alt="Paysage suisse traversé par un réseau numérique stylisé" />
       <div className="hero-copy">
         <p className="eyebrow">Infrastructures industrielles · Planification électrique · Technologies IT</p>
         <h1 id="hero-title">Daniel Cruz</h1>
@@ -20,7 +22,7 @@ export default function Home() {
 
     <section className="section section-shell" aria-labelledby="pillars-title">
       <div className="section-heading"><p className="eyebrow">Trois piliers professionnels</p><h2 id="pillars-title">Une même rigueur, dans des environnements différents</h2><p>Le terrain, le plan et le système se répondent: observer la réalité, structurer l’information et valider le résultat.</p></div>
-      <div className="pillar-grid">{pillars.map((pillar) => <article className="pillar-card" key={pillar.id}><DomainArt pillar={pillar.id} /><div className="pillar-copy"><p className="eyebrow">{pillar.kicker}</p><h3>{pillar.title}</h3><p>{pillar.description}</p><div className="tags">{pillar.skills.map((skill) => <span key={skill}>{skill}</span>)}</div><Link className="text-link" href="/metiers/">Explorer ce domaine <span aria-hidden="true">→</span></Link></div></article>)}</div>
+      <div className="pillar-grid">{pillars.map((pillar) => <article className="pillar-card" key={pillar.id}><ResponsiveImage imageKey={pillarImageKeys[pillar.id]} className="pillar-image" sizes="(max-width: 980px) 40vw, 33vw" /><div className="pillar-copy"><p className="eyebrow">{pillar.kicker}</p><h3>{pillar.title}</h3><p>{pillar.description}</p><div className="tags">{pillar.skills.map((skill) => <span key={skill}>{skill}</span>)}</div><Link className="text-link" href="/metiers/">Explorer ce domaine <span aria-hidden="true">→</span></Link></div></article>)}</div>
     </section>
 
     <section className="section section-shell" aria-labelledby="projects-title"><div className="section-heading split"><div><p className="eyebrow">Expérience, pratique et laboratoire</p><h2 id="projects-title">Réalisations sélectionnées</h2></div><Link className="text-link" href="/realisations/">Toutes les réalisations <span aria-hidden="true">→</span></Link></div><div className="project-grid">{selected.map((project) => <ProjectCard key={project.slug} project={project} />)}</div></section>

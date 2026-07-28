@@ -1,12 +1,13 @@
 import Link from "next/link";
 import type { Project } from "../_data/content";
-import { DomainArt } from "./DomainArt";
+import { ResponsiveImage } from "./ResponsiveImage";
+import { projectImageKeys } from "../_data/images";
 
 export function ProjectCard({ project }: { project: Project }) {
   return (
     <article className="project-card">
       <Link className="project-media" href={`/realisations/${project.slug}/`} aria-label={`Découvrir ${project.title}`}>
-        <DomainArt pillar={project.pillar} compact />
+        <ResponsiveImage imageKey={projectImageKeys[project.slug]} sizes="(max-width: 680px) 100vw, (max-width: 980px) 50vw, 33vw" />
       </Link>
       <div className="project-body">
         <span className="content-type">{project.type}</span>
