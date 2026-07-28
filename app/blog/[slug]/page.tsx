@@ -1,29 +1,24 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { articles } from "../../_data/content";
+import { publishedNotes } from "../../_data/notes";
+import { projects } from "../../_data/content";
+import { TechnicalIllustration } from "../../_components/TechnicalIllustration";
 
-const bodies: Record<string, { sections: { title: string; text: string }[]; source: string }> = {
-  "dns-annuaire-du-reseau": { sections: [
-    { title: "À quoi sert le DNS?", text: "Les équipements communiquent avec des adresses IP, mais les personnes retiennent plus facilement des noms. Le Domain Name System traduit ces noms en informations utilisables par le réseau." },
-    { title: "Pourquoi est-il essentiel dans Active Directory?", text: "Un domaine Windows publie dans DNS les services qui permettent aux postes de localiser un contrôleur de domaine. Un DNS incorrect peut empêcher une ouverture de session, une jonction au domaine ou l’application de stratégies." },
-    { title: "Le réflexe de diagnostic", text: "Vérifier d’abord l’adresse IP, le serveur DNS configuré, puis la résolution du nom. Cette progression évite de corriger le mauvais composant." },
-  ], source: "RFC 1034 et documentation Microsoft Learn sur DNS. Vérifiées le 28 juillet 2026." },
-  "methode-diagnostic-technique": { sections: [
-    { title: "Partir du symptôme", text: "Une panne décrite n’est pas encore une cause. La première étape consiste à clarifier le contexte, reproduire le comportement et relever les éléments observables." },
-    { title: "Isoler avant de remplacer", text: "Tester une hypothèse à la fois réduit les erreurs. Cette méthode vaut pour un ordinateur, une liaison réseau, un équipement électronique ou une installation technique." },
-    { title: "Valider après correction", text: "La remise en service n’est complète qu’après un test fonctionnel et une explication claire de ce qui a été observé et corrigé." },
-  ], source: "Synthèse de méthode issue de l’expérience de dépannage de Daniel Cruz; aucune règle réglementaire n’est formulée." },
-  "planification-du-plan-au-terrain": { sections: [
-    { title: "Le plan est un outil de communication", text: "Un plan technique doit rendre une intention exploitable. Il relie les contraintes du projet aux personnes qui préparent, coordonnent et exécutent les travaux." },
-    { title: "Anticiper les interfaces", text: "Les passages, alimentations, équipements et responsabilités doivent être compris suffisamment tôt pour limiter les reprises et les ambiguïtés." },
-    { title: "Documenter les décisions", text: "Une information tracée et adaptée à son destinataire facilite le suivi, les contrôles et la transmission entre intervenants." },
-  ], source: "Retour d’expérience général de planification; aucun document client ni prescription normative n’est publié." },
-  "fibre-link-test-otdr": { sections: [
-    { title: "Deux objectifs différents", text: "Un Link Test sert généralement à vérifier les performances d’une liaison selon une méthode définie. Un OTDR observe les événements et les pertes le long de la fibre à partir d’une mesure réflectométrique." },
-    { title: "Lire avant de conclure", text: "Une mesure doit être replacée dans son contexte: longueur, connecteurs, épissures, sens de test et paramètres utilisés influencent l’interprétation." },
-    { title: "Documenter le contrôle", text: "Conserver les résultats utiles permet de comparer, localiser une anomalie et communiquer une observation vérifiable." },
-  ], source: "Principes généraux de mesure fibre; le contenu ne remplace pas les procédures du fabricant ou les normes applicables." },
-};
-
-export function generateStaticParams() { return articles.filter((article) => article.status === "published").map((article) => ({ slug: article.slug })); }
-export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) { const { slug } = await params; const article = articles.find((item) => item.slug === slug && item.status === "published"); const body = bodies[slug]; if (!article || !body) notFound(); return <article className="article-page section-shell"><Link className="back-link" href="/blog/">← Blog technique</Link><p className="eyebrow">{article.category} · {article.reading}</p><h1>{article.title}</h1><p className="article-lead">{article.excerpt}</p><div className="article-body">{body.sections.map((section) => <section key={section.title}><h2>{section.title}</h2><p>{section.text}</p></section>)}<p className="source-note">Repère de transparence: {body.source}</p></div></article>; }
+export function generateStaticParams() { return publishedNotes.map((note) => ({ slug: note.slug })); }
+export default async function NotePage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const note = publishedNotes.find((item) => item.slug === slug);
+  if (!note) notFound();
+  const index = publishedNotes.findIndex((item) => item.slug === slug);
+  const previous = publishedNotes[(index - 1 + publishedNotes.length) % publishedNotes.length];
+  const next = publishedNotes[(index + 1) % publishedNotes.length];
+  const related = publishedNotes.filter((item) => item.slug !== slug && (item.category === note.category || item.illustration === note.illustration)).slice(0, 3);
+  const project = note.relatedProject ? projects.find((item) => item.slug === note.relatedProject) : undefined;
+  return <article className="note-page section-shell">
+    <Link className="back-link" href="/blog/">← Carnet technique</Link>
+    <header className="note-hero"><div><p className="eyebrow">{note.category} · {note.type}</p><h1>{note.title}</h1><p className="article-lead">{note.summary}</p><dl className="note-meta"><div><dt>Niveau</dt><dd>{note.level}</dd></div><div><dt>Lecture</dt><dd>{note.reading}</dd></div><div><dt>Mise à jour</dt><dd><time dateTime={note.updatedAt}>28 juillet 2026</time></dd></div></dl></div><TechnicalIllustration kind={note.illustration} /></header>
+    <div className="note-layout"><main className="article-body"><p className="personal-intro">{note.introduction}</p>{note.sections.map((section) => <section key={section.title}><h2>{section.title}</h2><p>{section.text}</p></section>)}<section className="key-points"><h2>Ce que je retiens</h2><ul>{note.keyPoints.map((point) => <li key={point}>{point}</li>)}</ul></section>{project && <section className="related-project"><p className="eyebrow">Projet lié</p><h2>{project.title}</h2><p>{project.summary}</p><Link className="text-link" href={`/realisations/${project.slug}/`}>Voir la réalisation <span aria-hidden="true">→</span></Link></section>}<section className="note-sources"><h2>Sources et repères</h2><ul>{note.sources.map((source) => <li key={source}>{source}</li>)}</ul></section></main><aside className="note-aside"><h2>Outils associés</h2><div className="tags">{note.tools.map((tool) => <span key={tool}>{tool}</span>)}</div><p>Statut : note publiée</p></aside></div>
+    <nav className="note-navigation" aria-label="Navigation entre les notes"><Link href={`/blog/${previous.slug}/`}><span>← Note précédente</span><strong>{previous.title}</strong></Link><Link href={`/blog/${next.slug}/`}><span>Note suivante →</span><strong>{next.title}</strong></Link></nav>
+    <section className="related-notes"><p className="eyebrow">Continuer la lecture</p><h2>Notes liées</h2><div>{related.map((item) => <Link key={item.slug} href={`/blog/${item.slug}/`}><span>{item.category}</span><strong>{item.title}</strong></Link>)}</div></section>
+  </article>;
+}
