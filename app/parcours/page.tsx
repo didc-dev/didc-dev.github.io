@@ -10,7 +10,7 @@ export const metadata: Metadata = pageMetadata("Parcours", "Parcours professionn
 const timelineImages: PortfolioImageKey[] = ["timeline2024", "timeline2023", "timeline2021", "timeline2017", "timeline2013", "timeline2010"];
 
 const timelineNotes = [
-  "Mon poste actuel relie l’exécution, la compréhension des installations et la préparation technique.",
+  "Cette expérience reliait l’exécution, la compréhension des installations et la préparation technique.",
   "Cette étape a renforcé ma capacité à coordonner les informations et à suivre les décisions jusqu’au terrain.",
   "La planification m’a appris à anticiper les contraintes, coordonner les informations et documenter les décisions.",
   "Le terrain et le CFC ont construit une méthode de travail rigoureuse et progressive.",
