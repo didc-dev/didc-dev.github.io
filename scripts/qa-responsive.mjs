@@ -28,8 +28,9 @@ const allRoutes = [
 const allViewports = [
   { name: "wide", width: 1920, height: 1080 },
   { name: "desktop", width: 1440, height: 1000 },
-  { name: "laptop", width: 1024, height: 900 },
+  { name: "laptop", width: 1024, height: 768 },
   { name: "tablet", width: 768, height: 1024 },
+  { name: "mobile-large", width: 430, height: 932 },
   { name: "mobile", width: 390, height: 844 },
   { name: "mobile-compact", width: 360, height: 800 },
   { name: "mobile-landscape", width: 844, height: 390 },
