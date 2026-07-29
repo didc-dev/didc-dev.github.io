@@ -30,3 +30,12 @@ Les résultats de lint, typecheck, tests, build, contrôles visuels et publicati
 - Intégration autorisée du permis B, des loisirs et des drones sans inventer le modèle non confirmé.
 - Ajout d’illustrations techniques HTML/CSS, de filtres, d’une navigation active et de données structurées.
 - Enrichissement du parcours, des formations, du blog et des études de cas.
+
+## 29 juillet 2026 — Migration vers didc-dev et fiabilisation responsive
+
+- Migration de l’adresse publique vers `https://didc-dev.github.io/`.
+- Ajout des URL canoniques, des métadonnées de partage, de `robots.txt` et du sitemap statique.
+- Correction du menu mobile, des seuils tablette, des cibles tactiles et de plusieurs défauts d’accessibilité.
+- Remplacement de la source AVIF par WebP après constat d’un échec de décodage réel dans un navigateur mobile.
+- Ajout d’un QR code vérifié sur la page Contact et téléchargeable séparément.
+- Extension du contrôle responsive aux formats ordinateur, tablette, téléphone portrait et téléphone paysage.

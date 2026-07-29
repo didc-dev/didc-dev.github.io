@@ -3,8 +3,9 @@ import { PageIntro } from "../_components/PageIntro";
 import { ResponsiveImage } from "../_components/ResponsiveImage";
 import { formations } from "../_data/content";
 import type { PortfolioImageKey } from "../_data/images";
+import { pageMetadata } from "../_lib/site";
 
-export const metadata: Metadata = { title: "Formations", description: "Diplômes terminés et apprentissages actuels de Daniel Cruz." };
+export const metadata: Metadata = pageMetadata("Formations", "Diplômes terminés et apprentissages actuels de Daniel Cruz.", "/formations/");
 const formationImages: PortfolioImageKey[] = ["formationPlanification", "formationElectricien", "formationInformatique", "formationSystems"];
 
 export default function FormationsPage() {

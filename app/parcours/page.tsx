@@ -3,8 +3,9 @@ import { PageIntro } from "../_components/PageIntro";
 import { ResponsiveImage } from "../_components/ResponsiveImage";
 import { experiences, pillars } from "../_data/content";
 import { pillarImageKeys, type PortfolioImageKey } from "../_data/images";
+import { pageMetadata } from "../_lib/site";
 
-export const metadata: Metadata = { title: "Parcours", description: "Parcours professionnel de Daniel Cruz entre infrastructures, planification, électronique et informatique." };
+export const metadata: Metadata = pageMetadata("Parcours", "Parcours professionnel de Daniel Cruz entre infrastructures, planification, électronique et informatique.", "/parcours/");
 
 const timelineImages: PortfolioImageKey[] = ["timeline2024", "timeline2023", "timeline2021", "timeline2017", "timeline2013", "timeline2010"];
 
