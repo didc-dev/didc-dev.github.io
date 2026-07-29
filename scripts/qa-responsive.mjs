@@ -27,7 +27,8 @@ const allRoutes = [
 
 const allViewports = [
   { name: "desktop", width: 1440, height: 1000 },
-  { name: "tablet", width: 820, height: 1180 },
+  { name: "laptop", width: 1024, height: 900 },
+  { name: "tablet", width: 768, height: 1024 },
   { name: "mobile", width: 390, height: 844 },
   { name: "mobile-landscape", width: 844, height: 390 },
 ];
@@ -197,17 +198,70 @@ for (const viewport of viewports) {
             }
           }))).filter(Boolean);
           const menuButton = document.querySelector('.menu-button');
+          const recruiterDock = document.querySelector('.recruiter-dock');
+          const recruiterToggle = document.querySelector('.recruiter-toggle');
+          const recruiterPanel = document.querySelector('.recruiter-panel');
           let menuInteraction = null;
           if (menuButton && getComputedStyle(menuButton).display !== 'none') {
             menuButton.click();
             await new Promise((resolve) => requestAnimationFrame(resolve));
             const opened = menuButton.getAttribute('aria-expanded') === 'true' && document.querySelector('#main-nav')?.classList.contains('open');
+            const recruiterInert = recruiterDock?.inert === true;
+            recruiterToggle?.focus();
+            const recruiterFocusBlocked = document.activeElement !== recruiterToggle;
             document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
             await new Promise((resolve) => requestAnimationFrame(resolve));
             menuInteraction = {
               opened,
               closed: menuButton.getAttribute('aria-expanded') === 'false' && !document.querySelector('#main-nav')?.classList.contains('open'),
               focusRestored: document.activeElement === menuButton,
+              recruiterInert,
+              recruiterFocusBlocked,
+            };
+          }
+          let recruiterInteraction = null;
+          if (recruiterDock && recruiterToggle && recruiterPanel) {
+            recruiterToggle.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+            await new Promise((resolve) => requestAnimationFrame(resolve));
+            const hoverStayedClosed = recruiterToggle.getAttribute('aria-expanded') === 'false';
+
+            recruiterToggle.click();
+            await new Promise((resolve) => requestAnimationFrame(resolve));
+            const panelRect = recruiterPanel.getBoundingClientRect();
+            const opened = recruiterToggle.getAttribute('aria-expanded') === 'true'
+              && recruiterPanel.getAttribute('aria-hidden') === 'false';
+            const pageScrollable = getComputedStyle(document.body).overflowY !== 'hidden';
+            const panelBounded = panelRect.width <= 380 && panelRect.width < window.innerWidth;
+
+            document.querySelector('.recruiter-permit-card')?.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+            const internalClickKeptOpen = recruiterToggle.getAttribute('aria-expanded') === 'true';
+            document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+            await new Promise((resolve) => requestAnimationFrame(resolve));
+            const escapeClosed = recruiterToggle.getAttribute('aria-expanded') === 'false';
+            const focusRestored = document.activeElement === recruiterToggle;
+
+            const fixedTopBefore = recruiterToggle.getBoundingClientRect().top;
+            window.scrollTo(0, Math.min(400, Math.max(0, document.documentElement.scrollHeight - window.innerHeight)));
+            await new Promise((resolve) => requestAnimationFrame(resolve));
+            const fixedWhileScrolling = Math.abs(recruiterToggle.getBoundingClientRect().top - fixedTopBefore) < 2;
+            window.scrollTo(0, 0);
+
+            recruiterToggle.click();
+            await new Promise((resolve) => requestAnimationFrame(resolve));
+            document.querySelector('main')?.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+            await new Promise((resolve) => requestAnimationFrame(resolve));
+            const outsideClosed = recruiterToggle.getAttribute('aria-expanded') === 'false';
+            const outsideFocusRestored = document.activeElement === recruiterToggle;
+
+            recruiterToggle.click();
+            await new Promise((resolve) => requestAnimationFrame(resolve));
+            recruiterToggle.click();
+            await new Promise((resolve) => requestAnimationFrame(resolve));
+            const toggleClosed = recruiterToggle.getAttribute('aria-expanded') === 'false';
+
+            recruiterInteraction = {
+              hoverStayedClosed, opened, pageScrollable, panelBounded, internalClickKeptOpen,
+              escapeClosed, focusRestored, fixedWhileScrolling, outsideClosed, outsideFocusRestored, toggleClosed,
             };
           }
           return {
@@ -218,6 +272,7 @@ for (const viewport of viewports) {
             decodeFailures: images.filter((image) => image.complete && image.naturalWidth === 0).map((image) => image.currentSrc || image.src),
             incompleteImages: images.filter((image) => !image.complete).map((image) => image.currentSrc || image.src || image.getAttribute('src') || '(source vide)'),
             menuInteraction,
+            recruiterInteraction,
             missingAlt: images.filter((image) => !image.hasAttribute('alt')).map((image) => image.currentSrc || image.src),
             overflow: document.documentElement.scrollWidth > window.innerWidth + 2,
             scrollWidth: document.documentElement.scrollWidth,
@@ -244,7 +299,9 @@ for (const viewport of viewports) {
   }
 }
 
-const failures = results.filter((entry) => entry.broken.length || entry.decodeFailures.length || entry.incompleteImages.length || entry.browserIssues.length || entry.missingAlt.length || entry.overflow || entry.placeholders.length || !entry.h1 || (entry.menuInteraction && (!entry.menuInteraction.opened || !entry.menuInteraction.closed || !entry.menuInteraction.focusRestored)));
+const failures = results.filter((entry) => entry.broken.length || entry.decodeFailures.length || entry.incompleteImages.length || entry.browserIssues.length || entry.missingAlt.length || entry.overflow || entry.placeholders.length || !entry.h1
+  || (entry.menuInteraction && (!entry.menuInteraction.opened || !entry.menuInteraction.closed || !entry.menuInteraction.focusRestored || !entry.menuInteraction.recruiterInert || !entry.menuInteraction.recruiterFocusBlocked))
+  || (entry.recruiterInteraction && Object.values(entry.recruiterInteraction).some((value) => !value)));
 await appendFile(progressPath, `REPORT ${results.length} ${failures.length}\n`);
 await writeFile(path.join(reportDir, "audit.json"), JSON.stringify({ results, failures }, null, 2));
 console.log(JSON.stringify({ pages: routes.length, checks: results.length, screenshots: screenshotsEnabled ? routes.filter((route) => screenshotRoutes.has(route)).length * viewports.length : 0, failures }, null, 2));

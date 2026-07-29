@@ -100,18 +100,67 @@ test("les données privées restent exclues du contenu visible", async () => {
   assert.match(visible, /Permis de conduire B/);
 });
 
-test("la page d’accueil annonce la disponibilité sans présenter un poste actuel", async () => {
+test("la page d’accueil et le panneau partagent le statut professionnel actuel", async () => {
   const page = await html("index.html");
   const visible = page.replace(/<head[\s\S]*?<\/head>/gi, "").replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<[^>]+>/g, " ");
-  assert.match(visible, /Disponible dès maintenant/);
-  assert.match(visible, /À la recherche d’une nouvelle opportunité/);
-  assert.doesNotMatch(visible, /Poste actuel|Connect Groupe E · depuis 2024/);
+  assert.equal((visible.match(/En poste actuellement/g) ?? []).length, 2);
+  assert.equal((visible.match(/Disponible après un délai de congé de 3 mois/g) ?? []).length, 2);
+  assert.doesNotMatch(visible, /Connect Groupe E · depuis 2024/);
+});
+
+test("la barre recruteur est globale, accessible et se ferme proprement", async () => {
+  const [layout, component] = await Promise.all([
+    source("app/layout.tsx"),
+    source("app/_components/StickyRecruiterBar.tsx"),
+  ]);
+  assert.match(layout, /<StickyRecruiterBar \/>/);
+  for (const marker of ["aria-expanded", "aria-controls", "Escape", "pointerdown", "usePathname", "triggerRef.current?.focus", "aria-hidden={!open}"]) {
+    assert.match(component, new RegExp(marker.replace(/[?.{}!]/g, "\\$&")));
+  }
+  for (const file of mainRoutes) {
+    const page = await html(file);
+    assert.match(page, /aria-controls="recruiter-panel"/);
+    assert.match(page, /id="recruiter-panel"/);
+  }
+});
+
+test("la configuration centralise le statut, le contact et les repères publics", async () => {
+  const [config, emailLink, hero, contact] = await Promise.all([
+    source("app/_data/recruiterBar.ts"), source("app/_components/EmailLink.tsx"),
+    source("app/_components/HeroPortraitCard.tsx"), source("app/contact/page.tsx"),
+  ]);
+  assert.match(config, /professionalStatus: ProfessionalStatus = "employed"/);
+  assert.match(config, /cvAvailable: false/);
+  assert.match(config, /cvPath: "\/documents\/daniel-cruz-cv\.pdf"/);
+  assert.match(config, /publicLabel: "Renens \(VD\), Suisse romande"/);
+  assert.match(config, /\{ code: "FR", label: "Français" \}/);
+  assert.match(emailLink, /contactEmailHref/);
+  assert.match(hero, /currentAvailability/);
+  assert.match(contact, /profileLocation/);
+  assert.match(contact, /profileLanguages/);
+});
+
+test("l’absence de CV ne crée aucun téléchargement cassé", async () => {
+  const page = await html("index.html");
+  assert.match(page, /PDF bientôt disponible/);
+  assert.doesNotMatch(page, /href="\/documents\/daniel-cruz-cv\.pdf"/);
+  await assert.rejects(access(new URL("public/documents/daniel-cruz-cv.pdf", root)));
+});
+
+test("les permis restent des repères illustratifs sans données sensibles", async () => {
+  const page = await html("index.html");
+  const component = await source("app/_components/StickyRecruiterBar.tsx");
+  assert.match(page, /Permis C/);
+  assert.match(page, /Autorisation d’établissement/);
+  assert.match(page, /Permis de conduire B/);
+  assert.match(component, /assetPath\("\/images\/daniel-cruz\.jpg"\)/);
+  assert.doesNotMatch(component, /numéro|validité|signature|code-barres|date de naissance/i);
 });
 
 test("la disponibilité et les périodes professionnelles sont cohérentes sur toutes les pages concernées", async () => {
   const pages = await Promise.all(["index.html", "parcours/index.html", "realisations/index.html", "realisations/infrastructures-industrielles/index.html", "realisations/planification-electrique/index.html"].map(html));
   const visible = pages.map((page) => page.replace(/<head[\s\S]*?<\/head>/gi, "").replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<[^>]+>/g, " ")).join("\n");
-  assert.doesNotMatch(visible, /Poste actuel|depuis 2024|2021[–-]aujourd’hui|raison du départ|licenci/i);
+  assert.doesNotMatch(visible, /Poste actuel(?!lement)|depuis 2024|2021[–-]aujourd’hui|raison du départ|licenci/i);
   assert.match(visible, /2024[–-]2026/);
   assert.match(visible, /2021[–-]2026/);
 });
@@ -176,4 +225,6 @@ test("les protections responsive et mouvement réduit sont présentes", async ()
   assert.match(css, /overflow-x:clip/);
   assert.match(css, /clamp\(2\.75rem,15vw,4rem\)/);
   assert.match(css, /prefers-reduced-motion:reduce/);
+  assert.match(css, /@media print[\s\S]*?\.recruiter-dock[\s\S]*?display:none/);
+  assert.match(css, /@media \(max-width:768px\)[\s\S]*?\.recruiter-dock/);
 });

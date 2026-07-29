@@ -13,7 +13,7 @@ export function SiteHeader() {
   useEffect(() => {
     if (!open) return;
     const previousOverflow = document.body.style.overflow;
-    const background = Array.from(document.querySelectorAll<HTMLElement>("main, footer"));
+    const background = Array.from(document.querySelectorAll<HTMLElement>("main, footer, .recruiter-dock"));
     document.body.style.overflow = "hidden";
     background.forEach((element) => { element.inert = true; });
     const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") close(true); };
