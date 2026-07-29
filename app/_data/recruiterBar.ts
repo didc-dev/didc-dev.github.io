@@ -39,9 +39,8 @@ export const profileLanguages = [
 ] as const;
 
 export const recruiterBar = {
-  // TODO: placer le CV réel à ce chemin, puis passer cvAvailable à true.
   cvPath: "/documents/daniel-cruz-cv.pdf",
-  cvAvailable: false,
+  cvAvailable: true,
   residencePermit: {
     title: "Permis C",
     detail: "Autorisation d’établissement",

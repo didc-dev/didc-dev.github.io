@@ -130,7 +130,7 @@ test("la configuration centralise le statut, le contact et les repères publics"
     source("app/_components/HeroPortraitCard.tsx"), source("app/contact/page.tsx"),
   ]);
   assert.match(config, /professionalStatus: ProfessionalStatus = "available"/);
-  assert.match(config, /cvAvailable: false/);
+  assert.match(config, /cvAvailable: true/);
   assert.match(config, /cvPath: "\/documents\/daniel-cruz-cv\.pdf"/);
   assert.match(config, /publicLabel: "Renens \(VD\), Suisse romande"/);
   assert.match(config, /\{ code: "FR", label: "Français" \}/);
@@ -140,11 +140,13 @@ test("la configuration centralise le statut, le contact et les repères publics"
   assert.match(contact, /profileLanguages/);
 });
 
-test("l’absence de CV ne crée aucun téléchargement cassé", async () => {
+test("le CV est téléchargeable uniquement depuis la barre recruteur", async () => {
   const page = await html("index.html");
-  assert.match(page, /PDF bientôt disponible/);
-  assert.doesNotMatch(page, /href="\/documents\/daniel-cruz-cv\.pdf"/);
-  await assert.rejects(access(new URL("public/documents/daniel-cruz-cv.pdf", root)));
+  assert.doesNotMatch(page, /PDF bientôt disponible/);
+  assert.equal(page.match(/href="\/documents\/daniel-cruz-cv\.pdf"/g)?.length, 1);
+  assert.match(page, /href="\/documents\/daniel-cruz-cv\.pdf"[^>]*download/);
+  await access(new URL("public/documents/daniel-cruz-cv.pdf", root));
+  await access(new URL("dist/client/documents/daniel-cruz-cv.pdf", root));
 });
 
 test("les permis restent des repères illustratifs sans photo ni données sensibles", async () => {
