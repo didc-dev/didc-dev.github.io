@@ -12,6 +12,31 @@ const noteSlugs = ["dns-a-quoi-sert-il", "dhcp-configuration-reseau", "active-di
 
 test("les routes publiques principales sont exportées", async () => {
   for (const route of mainRoutes) await access(new URL(`dist/client/${route}`, root));
+  for (const file of ["robots.txt", "sitemap.xml", "qr-didc-dev.png"]) await access(new URL(`dist/client/${file}`, root));
+});
+
+test("les repères publics utilisent la nouvelle adresse GitHub Pages", async () => {
+  const [homePage, projectPage, notePage, robots, sitemap] = await Promise.all([html("index.html"), html("realisations/laboratoire-proxmox-ve/index.html"), html("blog/dns-a-quoi-sert-il/index.html"), html("robots.txt"), html("sitemap.xml")]);
+  for (const content of [homePage, robots, sitemap]) {
+    assert.doesNotMatch(content, /Peixinho987|localhost/i);
+  }
+  assert.match(homePage, /rel="canonical" href="https:\/\/didc-dev\.github\.io\/"/);
+  assert.match(projectPage, /rel="canonical" href="https:\/\/didc-dev\.github\.io\/realisations\/laboratoire-proxmox-ve\/"/);
+  assert.match(notePage, /rel="canonical" href="https:\/\/didc-dev\.github\.io\/blog\/dns-a-quoi-sert-il\/"/);
+  assert.match(robots, /Sitemap: https:\/\/didc-dev\.github\.io\/sitemap\.xml/);
+  assert.match(sitemap, /<loc>https:\/\/didc-dev\.github\.io\/<\/loc>/);
+});
+
+test("la structure accessible évite les contrôles masqués et les régions principales imbriquées", async () => {
+  const [tradeExplorer, notePage, projectCard] = await Promise.all([
+    source("app/_components/TradeExplorer.tsx"),
+    source("app/blog/[slug]/page.tsx"),
+    source("app/_components/ProjectCard.tsx"),
+  ]);
+  assert.doesNotMatch(tradeExplorer, /className="trade-list" aria-hidden="true"/);
+  assert.doesNotMatch(notePage, /<main className="article-body">/);
+  assert.doesNotMatch(projectCard, /aria-hidden="true" tabIndex=\{-1\}/);
+  assert.match(projectCard, /<h3><Link href=/);
 });
 
 test("les réalisations et notes publiées sont exportées", async () => {
@@ -52,8 +77,14 @@ test("les données privées restent exclues du contenu visible", async () => {
   assert.match(visible, /Permis de conduire B/);
 });
 
-test("les images publiques possèdent un texte alternatif", async () => {
-  for (const page of await Promise.all(mainRoutes.map(html))) for (const match of page.matchAll(/<img\b[^>]*>/g)) assert.match(match[0], /\balt="[^"]+"/);
+test("les images publiques possèdent un attribut alternatif", async () => {
+  for (const page of await Promise.all(mainRoutes.map(html))) for (const match of page.matchAll(/<img\b[^>]*>/g)) assert.match(match[0], /\balt="[^"]*"/);
+});
+
+test("les images responsive utilisent le format WebP compatible", async () => {
+  const responsiveImage = await source("app/_components/ResponsiveImage.tsx");
+  assert.match(responsiveImage, /type="image\/webp"/);
+  assert.doesNotMatch(responsiveImage, /type="image\/avif"/);
 });
 
 test("chaque note publiée possède un visuel dédié et unique", async () => {

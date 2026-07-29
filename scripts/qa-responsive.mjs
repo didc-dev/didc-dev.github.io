@@ -5,12 +5,12 @@ import process from "node:process";
 
 const browserPath = "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe";
 const baseUrl = process.env.QA_BASE_URL ?? "http://127.0.0.1:3000";
-const reportDir = path.resolve(".qa-responsive");
+const reportDir = path.resolve(process.env.QA_REPORT_DIR ?? ".qa-responsive");
 const profileDir = path.join(reportDir, "browser-profile");
 const port = 9333;
 const externalBrowser = process.env.QA_EXTERNAL_BROWSER === "1";
 
-const routes = [
+const allRoutes = [
   "/", "/blog/", "/blog/active-directory-role-general/", "/blog/agdpl-explique-simplement/",
   "/blog/autocad-revit-approches/", "/blog/dhcp-configuration-reseau/",
   "/blog/diagnostic-reseau-premiere-methode/", "/blog/diagnostiquer-sans-conclure/",
@@ -24,11 +24,16 @@ const routes = [
   "/realisations/planification-electrique/", "/realisations/raspberry-pi-services/",
 ];
 
-const viewports = [
+const allViewports = [
   { name: "desktop", width: 1440, height: 1000 },
   { name: "tablet", width: 820, height: 1180 },
   { name: "mobile", width: 390, height: 844 },
+  { name: "mobile-landscape", width: 844, height: 390 },
 ];
+const requestedRoutes = process.env.QA_ROUTE_FILTER?.split(",").map((value) => value.trim()).filter(Boolean);
+const requestedViewports = process.env.QA_VIEWPORT_FILTER?.split(",").map((value) => value.trim()).filter(Boolean);
+const routes = requestedRoutes?.length ? allRoutes.filter((route) => requestedRoutes.includes(route)) : allRoutes;
+const viewports = requestedViewports?.length ? allViewports.filter((viewport) => requestedViewports.includes(viewport.name)) : allViewports;
 
 const screenshotRoutes = new Set(["/", "/parcours/", "/formations/", "/metiers/", "/realisations/", "/blog/", "/contact/"]);
 
@@ -126,32 +131,62 @@ for (const viewport of viewports) {
         awaitPromise: true,
         expression: `(async () => {
           const step = Math.max(320, window.innerHeight - 120);
-          for (let y = 0; y < document.documentElement.scrollHeight; y += step) {
+          const pageHeight = document.documentElement.scrollHeight;
+          for (let y = 0; y < pageHeight; y += step) {
             window.scrollTo(0, y);
             await new Promise((resolve) => setTimeout(resolve, 35));
           }
           window.scrollTo(0, 0);
-          await Promise.all([...document.images].map((image) => {
-            if (image.complete) return Promise.resolve();
-            return new Promise((resolve) => {
-              image.addEventListener('load', resolve, { once: true });
-              image.addEventListener('error', resolve, { once: true });
-            });
-          }));
-          await document.fonts.ready;
+          await Promise.race([
+            Promise.all([...document.images].map((image) => {
+              if (image.complete) return Promise.resolve();
+              return new Promise((resolve) => {
+                image.addEventListener('load', resolve, { once: true });
+                image.addEventListener('error', resolve, { once: true });
+              });
+            })),
+            new Promise((resolve) => setTimeout(resolve, 5000)),
+          ]);
+          await Promise.race([document.fonts.ready, new Promise((resolve) => setTimeout(resolve, 2000))]);
           await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
         })()`,
       });
       const { result } = await send("Runtime.evaluate", {
+        awaitPromise: true,
         returnByValue: true,
-        expression: `(() => {
+        expression: `(async () => {
           const images = [...document.images];
+          const imageUrls = [...new Set(images.map((image) => image.currentSrc || image.src).filter(Boolean))];
+          const broken = (await Promise.all(imageUrls.map(async (url) => {
+            try {
+              const response = await fetch(url, { method: 'HEAD', cache: 'no-store' });
+              return response.ok ? null : url;
+            } catch {
+              return url;
+            }
+          }))).filter(Boolean);
+          const menuButton = document.querySelector('.menu-button');
+          let menuInteraction = null;
+          if (menuButton && getComputedStyle(menuButton).display !== 'none') {
+            menuButton.click();
+            await new Promise((resolve) => requestAnimationFrame(resolve));
+            const opened = menuButton.getAttribute('aria-expanded') === 'true' && document.querySelector('#main-nav')?.classList.contains('open');
+            document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+            await new Promise((resolve) => requestAnimationFrame(resolve));
+            menuInteraction = {
+              opened,
+              closed: menuButton.getAttribute('aria-expanded') === 'false' && !document.querySelector('#main-nav')?.classList.contains('open'),
+              focusRestored: document.activeElement === menuButton,
+            };
+          }
           return {
             title: document.title,
             h1: document.querySelector('h1')?.textContent?.trim() || '',
             imageCount: images.length,
-            broken: images.filter((image) => !image.complete || image.naturalWidth === 0).map((image) => image.currentSrc || image.src),
-            missingAlt: images.filter((image) => !image.getAttribute('alt')).map((image) => image.currentSrc || image.src),
+            broken,
+            decodeFailures: images.filter((image) => image.complete && image.naturalWidth === 0).map((image) => image.currentSrc || image.src),
+            menuInteraction,
+            missingAlt: images.filter((image) => !image.hasAttribute('alt')).map((image) => image.currentSrc || image.src),
             overflow: document.documentElement.scrollWidth > window.innerWidth + 2,
             scrollWidth: document.documentElement.scrollWidth,
             viewportWidth: window.innerWidth,
@@ -176,7 +211,7 @@ for (const viewport of viewports) {
   }
 }
 
-const failures = results.filter((entry) => entry.broken.length || entry.missingAlt.length || entry.overflow || entry.placeholders.length || !entry.h1);
+const failures = results.filter((entry) => entry.broken.length || entry.decodeFailures.length || entry.missingAlt.length || entry.overflow || entry.placeholders.length || !entry.h1 || (entry.menuInteraction && (!entry.menuInteraction.opened || !entry.menuInteraction.closed || !entry.menuInteraction.focusRestored)));
 await appendFile(progressPath, `REPORT ${results.length} ${failures.length}\n`);
 await writeFile(path.join(reportDir, "audit.json"), JSON.stringify({ results, failures }, null, 2));
 console.log(JSON.stringify({ pages: routes.length, checks: results.length, screenshots: screenshotRoutes.size * viewports.length, failures }, null, 2));

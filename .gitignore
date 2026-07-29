@@ -40,7 +40,8 @@ next-env.d.ts
 /.wrangler/
 /outputs/
 /work/
-/.qa-responsive/
+/.qa-responsive*/
 /.qa-run.log
 /qa-run.log
+/qa-progress.log
 *.tsbuildinfo

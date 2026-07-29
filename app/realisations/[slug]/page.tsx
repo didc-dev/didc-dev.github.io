@@ -1,11 +1,19 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { projects } from "../../_data/content";
 import { ResponsiveImage } from "../../_components/ResponsiveImage";
 import { projectImageKeys } from "../../_data/images";
+import { pageMetadata } from "../../_lib/site";
 
 export function generateStaticParams() {
   return projects.map((project) => ({ slug: project.slug }));
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const project = projects.find((item) => item.slug === slug);
+  return project ? pageMetadata(project.title, project.summary, `/realisations/${project.slug}/`) : {};
 }
 
 export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {

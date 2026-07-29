@@ -8,7 +8,7 @@ export function SiteFooter() {
         imageKey="footer"
         className="footer-panorama"
         sizes="100vw"
-        alt="Paysage suisse au crépuscule avec une trame de réseau discrète"
+        alt=""
       />
       <div className="section-shell footer-grid">
         <div>
