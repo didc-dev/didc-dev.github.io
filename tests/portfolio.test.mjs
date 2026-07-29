@@ -230,7 +230,11 @@ test("les protections responsive et mouvement réduit sont présentes", async ()
   assert.match(css, /@media \(max-width:768px\)[\s\S]*?\.recruiter-dock/);
   assert.match(css, /\.recruiter-dock \{[^}]*right:0/);
   assert.match(css, /\.recruiter-toggle \{[^}]*right:-7px[^}]*width:34px[^}]*height:96px/);
-  assert.match(css, /\.hero-panorama \{[^}]*height:clamp\(280px,22vw,340px\)[^}]*opacity:1[^}]*mask-image:none/);
-  assert.match(css, /\.hero-panorama img \{ object-fit:contain; \}/);
+  assert.match(css, /\.hero \{[^}]*grid-template-rows:clamp\(340px,28vw,405px\)[^}]*overflow:visible/);
+  assert.match(css, /\.hero-panorama \{[^}]*height:100%[^}]*opacity:1[^}]*mask-image:none/);
+  assert.match(css, /\.hero-panorama img \{ object-fit:cover; object-position:center; \}/);
+  assert.match(css, /\.hero \.portrait-card \{[^}]*grid-row:1\/3[^}]*margin-top:clamp\(255px,21vw,300px\)/);
+  assert.match(css, /@media \(max-width:980px\)[\s\S]*?\.hero \{[^}]*grid-template-columns:minmax\(0,1fr\)/);
+  assert.match(css, /@media \(max-width:680px\)[\s\S]*?\.hero \.portrait-card \{ grid-row:2; \}[\s\S]*?\.hero-copy \{ grid-row:3; \}/);
   assert.doesNotMatch(css, /\.hero::before \{[^}]*rgba\(246,243,237,\.93\)/);
 });
