@@ -228,4 +228,6 @@ test("les protections responsive et mouvement réduit sont présentes", async ()
   assert.match(css, /prefers-reduced-motion:reduce/);
   assert.match(css, /@media print[\s\S]*?\.recruiter-dock[\s\S]*?display:none/);
   assert.match(css, /@media \(max-width:768px\)[\s\S]*?\.recruiter-dock/);
+  assert.match(css, /\.recruiter-dock \{[^}]*right:0/);
+  assert.match(css, /\.recruiter-toggle \{[^}]*right:-7px[^}]*width:34px[^}]*height:96px/);
 });
