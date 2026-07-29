@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { assetPath } from "../_lib/site";
@@ -115,13 +114,12 @@ export function StickyRecruiterBar() {
           </a>
 
           <div className="recruiter-permit-card">
-            <Image
-              src={assetPath("/images/daniel-cruz.jpg")}
-              width={560}
-              height={560}
-              alt="Portrait professionnel de Daniel Cruz"
-              unoptimized
-            />
+            <span className="recruiter-residence-card" aria-hidden="true">
+              <i className="residence-card-portrait" />
+              <i className="residence-card-line residence-card-line-one" />
+              <i className="residence-card-line residence-card-line-two" />
+              <b>C</b>
+            </span>
             <div><strong>{recruiterBar.residencePermit.title}</strong><small>{recruiterBar.residencePermit.detail}</small><i aria-hidden="true" /></div>
           </div>
 

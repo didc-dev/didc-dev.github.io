@@ -1,6 +1,6 @@
 export type ProfessionalStatus = "employed" | "available";
 
-export const professionalStatus: ProfessionalStatus = "employed";
+export const professionalStatus: ProfessionalStatus = "available";
 
 export const availabilityByStatus = {
   employed: {

@@ -100,11 +100,11 @@ test("les données privées restent exclues du contenu visible", async () => {
   assert.match(visible, /Permis de conduire B/);
 });
 
-test("la page d’accueil et le panneau partagent le statut professionnel actuel", async () => {
+test("la page d’accueil et le panneau partagent la disponibilité immédiate", async () => {
   const page = await html("index.html");
   const visible = page.replace(/<head[\s\S]*?<\/head>/gi, "").replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<[^>]+>/g, " ");
-  assert.equal((visible.match(/En poste actuellement/g) ?? []).length, 2);
-  assert.equal((visible.match(/Disponible après un délai de congé de 3 mois/g) ?? []).length, 2);
+  assert.equal((visible.match(/Disponible pour de nouvelles opportunités/g) ?? []).length, 2);
+  assert.equal((visible.match(/Disponible dès maintenant/g) ?? []).length, 2);
   assert.doesNotMatch(visible, /Connect Groupe E · depuis 2024/);
 });
 
@@ -129,7 +129,7 @@ test("la configuration centralise le statut, le contact et les repères publics"
     source("app/_data/recruiterBar.ts"), source("app/_components/EmailLink.tsx"),
     source("app/_components/HeroPortraitCard.tsx"), source("app/contact/page.tsx"),
   ]);
-  assert.match(config, /professionalStatus: ProfessionalStatus = "employed"/);
+  assert.match(config, /professionalStatus: ProfessionalStatus = "available"/);
   assert.match(config, /cvAvailable: false/);
   assert.match(config, /cvPath: "\/documents\/daniel-cruz-cv\.pdf"/);
   assert.match(config, /publicLabel: "Renens \(VD\), Suisse romande"/);
@@ -147,13 +147,14 @@ test("l’absence de CV ne crée aucun téléchargement cassé", async () => {
   await assert.rejects(access(new URL("public/documents/daniel-cruz-cv.pdf", root)));
 });
 
-test("les permis restent des repères illustratifs sans données sensibles", async () => {
+test("les permis restent des repères illustratifs sans photo ni données sensibles", async () => {
   const page = await html("index.html");
   const component = await source("app/_components/StickyRecruiterBar.tsx");
   assert.match(page, /Permis C/);
   assert.match(page, /Autorisation d’établissement/);
   assert.match(page, /Permis de conduire B/);
-  assert.match(component, /assetPath\("\/images\/daniel-cruz\.jpg"\)/);
+  assert.match(component, /recruiter-residence-card/);
+  assert.doesNotMatch(component, /daniel-cruz\.jpg|Portrait professionnel de Daniel Cruz/);
   assert.doesNotMatch(component, /numéro|validité|signature|code-barres|date de naissance/i);
 });
 
