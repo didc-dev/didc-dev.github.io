@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { assetPath } from "../_lib/site";
+import { currentAvailability, professionalStatus, profileLocation } from "../_data/recruiterBar";
 
 export function HeroPortraitCard() {
   return <aside className="portrait-card" aria-label="Disponibilité professionnelle">
@@ -23,11 +24,12 @@ export function HeroPortraitCard() {
     </div>
 
     <div className="portrait-card-body">
-      <div className="availability"><span />Basé en Suisse romande</div>
+      <div className="availability"><span />Basé à {profileLocation.short}</div>
       <div className="current-role">
         <span className="current-role-label">Disponibilité</span>
-        <strong>Disponible dès maintenant</strong>
-        <small>À la recherche d’une nouvelle opportunité</small>
+        <strong>{currentAvailability.label}</strong>
+        <small>{currentAvailability.detail}</small>
+        <i className={`hero-status-signal ${professionalStatus}`} aria-hidden="true" />
       </div>
     </div>
   </aside>;
