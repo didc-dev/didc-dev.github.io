@@ -13,6 +13,6 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const structuredData = { "@context": "https://schema.org", "@type": "Person", name: "Daniel Cruz", jobTitle: "Technicien en infrastructures industrielles et planificateur-électricien", address: { "@type": "PostalAddress", addressLocality: "Renens", addressRegion: "VD", addressCountry: "CH" }, knowsAbout: ["Infrastructures industrielles", "Planification électrique", "Installations électriques", "Diagnostic informatique", "Systèmes et réseaux"] };
+  const structuredData = { "@context": "https://schema.org", "@type": "Person", name: "Daniel Cruz", jobTitle: "Planificateur-électricien CFC", address: { "@type": "PostalAddress", addressLocality: "Renens", addressRegion: "VD", addressCountry: "CH" }, knowsAbout: ["Infrastructures industrielles", "Planification électrique", "Installations électriques", "Diagnostic informatique", "Systèmes et réseaux"] };
   return <html lang="fr-CH"><body><a className="skip-link" href="#contenu">Aller au contenu</a><SiteHeader /><main id="contenu">{children}</main><SiteFooter /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} /></body></html>;
 }

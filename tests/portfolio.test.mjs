@@ -77,6 +77,14 @@ test("les données privées restent exclues du contenu visible", async () => {
   assert.match(visible, /Permis de conduire B/);
 });
 
+test("la page d’accueil annonce la disponibilité sans présenter un poste actuel", async () => {
+  const page = await html("index.html");
+  const visible = page.replace(/<head[\s\S]*?<\/head>/gi, "").replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<[^>]+>/g, " ");
+  assert.match(visible, /Disponible dès maintenant/);
+  assert.match(visible, /À la recherche d’une nouvelle opportunité/);
+  assert.doesNotMatch(visible, /Poste actuel|Connect Groupe E · depuis 2024/);
+});
+
 test("les images publiques possèdent un attribut alternatif", async () => {
   for (const page of await Promise.all(mainRoutes.map(html))) for (const match of page.matchAll(/<img\b[^>]*>/g)) assert.match(match[0], /\balt="[^"]*"/);
 });
