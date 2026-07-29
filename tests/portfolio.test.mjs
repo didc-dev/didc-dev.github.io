@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { access, readFile } from "node:fs/promises";
 import test from "node:test";
 
@@ -9,6 +10,8 @@ const source = async (file) => readFile(new URL(file, root), "utf8");
 const mainRoutes = ["index.html", "parcours/index.html", "metiers/index.html", "realisations/index.html", "formations/index.html", "blog/index.html", "contact/index.html", "404.html"];
 const projectSlugs = ["infrastructures-industrielles", "planification-electrique", "fibre-optique-tests", "laboratoire-proxmox-ve", "active-directory-cruzlab", "diagnostic-informatique", "raspberry-pi-services", "domotique-maison"];
 const noteSlugs = ["dns-a-quoi-sert-il", "dhcp-configuration-reseau", "active-directory-role-general", "agdpl-explique-simplement", "hyperviseur-role", "proxmox-hyperv-virtualbox", "snapshot-sauvegarde-retour", "ip-masque-passerelle-dns", "diagnostic-reseau-premiere-methode", "diagnostiquer-sans-conclure", "link-test-et-otdr", "autocad-revit-approches", "documenter-une-modification", "tgbt-role-general", "raspberry-pi-petit-serveur", "wifi-ou-zigbee"];
+const publicRoutes = JSON.parse(await source("app/_data/public-routes.json"));
+const routeFile = (route) => route === "/" ? "index.html" : `${route.slice(1)}index.html`;
 
 test("les routes publiques principales sont exportées", async () => {
   for (const route of mainRoutes) await access(new URL(`dist/client/${route}`, root));
@@ -25,6 +28,26 @@ test("les repères publics utilisent la nouvelle adresse GitHub Pages", async ()
   assert.match(notePage, /rel="canonical" href="https:\/\/didc-dev\.github\.io\/blog\/dns-a-quoi-sert-il\/"/);
   assert.match(robots, /Sitemap: https:\/\/didc-dev\.github\.io\/sitemap\.xml/);
   assert.match(sitemap, /<loc>https:\/\/didc-dev\.github\.io\/<\/loc>/);
+});
+
+test("le manifeste public et les métadonnées SEO couvrent exactement les 31 pages", async () => {
+  assert.equal(publicRoutes.length, 31);
+  assert.equal(new Set(publicRoutes).size, publicRoutes.length);
+  const titles = new Set();
+  for (const route of publicRoutes) {
+    const page = await html(routeFile(route));
+    const canonical = `https://didc-dev.github.io${route}`;
+    assert.match(page, new RegExp(`rel="canonical" href="${canonical.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"`));
+    assert.match(page, new RegExp(`property="og:url" content="${canonical.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"`));
+    const title = page.match(/<title>(.*?)<\/title>/)?.[1];
+    assert.ok(title, `Titre manquant pour ${route}`);
+    assert.ok(!titles.has(title), `Titre dupliqué: ${title}`);
+    titles.add(title);
+    assert.doesNotMatch(page, /Peixinho987|localhost|NEXT_PUBLIC_SITE_URL/i);
+  }
+  const sitemap = await html("sitemap.xml");
+  const urls = [...sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map((match) => match[1]);
+  assert.deepEqual(urls, publicRoutes.map((route) => `https://didc-dev.github.io${route}`));
 });
 
 test("la structure accessible évite les contrôles masqués et les régions principales imbriquées", async () => {
@@ -83,6 +106,32 @@ test("la page d’accueil annonce la disponibilité sans présenter un poste act
   assert.match(visible, /Disponible dès maintenant/);
   assert.match(visible, /À la recherche d’une nouvelle opportunité/);
   assert.doesNotMatch(visible, /Poste actuel|Connect Groupe E · depuis 2024/);
+});
+
+test("la disponibilité et les périodes professionnelles sont cohérentes sur toutes les pages concernées", async () => {
+  const pages = await Promise.all(["index.html", "parcours/index.html", "realisations/index.html", "realisations/infrastructures-industrielles/index.html", "realisations/planification-electrique/index.html"].map(html));
+  const visible = pages.map((page) => page.replace(/<head[\s\S]*?<\/head>/gi, "").replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<[^>]+>/g, " ")).join("\n");
+  assert.doesNotMatch(visible, /Poste actuel|depuis 2024|2021[–-]aujourd’hui|raison du départ|licenci/i);
+  assert.match(visible, /2024[–-]2026/);
+  assert.match(visible, /2021[–-]2026/);
+});
+
+test("les sources publiques minimisent le nom et les cartes n’ont qu’une destination clavier", async () => {
+  const [profile, importedProfile, projectCard, notebook] = await Promise.all([
+    source("content/cv/public-profile.json"), source("app/_data/public-profile.json"), source("app/_components/ProjectCard.tsx"), source("app/_components/TechnicalNotebook.tsx"),
+  ]);
+  for (const content of [profile, importedProfile]) {
+    assert.doesNotMatch(content, /Daniel Inácio da Cruz/);
+    assert.match(content, /"name": "Daniel Cruz"/);
+  }
+  assert.equal((projectCard.match(/<Link\b/g) ?? []).length, 1);
+  assert.equal((notebook.match(/<Link\b/g) ?? []).length, 1);
+  assert.match(notebook, /role="group"/);
+});
+
+test("le QR code publié reste l’artefact validé", async () => {
+  const qr = await readFile(new URL("public/qr-didc-dev.png", root));
+  assert.equal(createHash("sha256").update(qr).digest("hex"), "55f838c06ac90ee45a955f317172f1f39ba33395a4194862b7b94e8eb2796696");
 });
 
 test("les images publiques possèdent un attribut alternatif", async () => {

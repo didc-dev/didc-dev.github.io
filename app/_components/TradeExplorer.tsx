@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import Link from "next/link";
+import { StaticLink as Link } from "./StaticLink";
 import { projects, trades } from "../_data/content";
 import { ResponsiveImage } from "./ResponsiveImage";
 import { tradeImageKeys } from "../_data/images";

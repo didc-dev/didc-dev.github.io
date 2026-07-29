@@ -8,28 +8,35 @@ Adresse publique de référence : `https://didc-dev.github.io/`
 
 - `npm run typecheck` : réussi.
 - `npm run lint` : réussi.
-- `npm test` : 14 tests réussis sur 14.
-- Export statique : 32 routes pré-rendues, aucune ignorée.
-- SEO statique : sitemap de 31 routes et `robots.txt` générés.
+- `npm test` : 19 tests réussis sur 19.
+- Export statique : 32 routes prérendues, aucune ignorée; manifeste public et sitemap limités aux 31 pages destinées à l’indexation.
 - Audit responsive : 124 contrôles sur 31 pages et quatre formats, zéro échec.
 - Formats : ordinateur 1440 × 1000, tablette 820 × 1180, téléphone portrait 390 × 844 et téléphone paysage 844 × 390.
-- Menu responsive : 93 contrôles réels; ouverture, fermeture avec Échap et restitution du focus réussies.
-- Images : zéro réponse manquante, zéro échec de décodage, zéro attribut `alt` manquant.
-- Débordement horizontal : aucun.
+- Images : zéro réponse manquante, zéro échec de décodage, zéro image incomplète et zéro attribut `alt` manquant.
+- Navigateur : zéro exception, erreur/avertissement console, échec réseau ou réponse HTTP 4xx/5xx.
+- Mise en page : zéro débordement horizontal; menu mobile ouvert/fermé avec Échap et focus restitué.
+- Lighthouse : accessibilité 100, bonnes pratiques 100 et SEO 100. Performance observée : 98 sur ordinateur et 75 sous simulation mobile fortement ralentie.
 
-Le détail machine est conservé dans `responsive/audit.json`. Les captures de la page Contact, dont le QR code, sont conservées pour les quatre formats dans le même dossier.
+Le détail machine se trouve dans `responsive/audit.json`. Les quatre captures Contact prouvent aussi l’affichage et la présence du QR sur chaque format.
+
+## Contenu et confidentialité
+
+- Disponibilité publiée : `Disponible dès maintenant` et `À la recherche d’une nouvelle opportunité`.
+- Connect Groupe E est borné à `2024–2026`; la planification est bornée à `2021–2026`.
+- Aucune raison de départ ni formulation d’emploi actuel non vérifiée n’est publiée.
+- Le nom légal complet inutilisé a été retiré des deux profils JSON publics; le nom public reste `Daniel Cruz`.
 
 ## QR code
 
-- Charge utile décodée indépendamment : `https://didc-dev.github.io/`
+- Charge utile redécodée avec OpenCV : `https://didc-dev.github.io/`
 - Dimensions : 1024 × 1024 pixels.
 - SHA-256 : `55f838c06ac90ee45a955f317172f1f39ba33395a4194862b7b94e8eb2796696`
 - Fichier public : `/qr-didc-dev.png`
 
 ## Dépendances
 
-Next.js et sa configuration ESLint ont été mis à jour de 16.2.6 à 16.2.12. `npm audit --omit=dev` signale encore trois vulnérabilités élevées transitives (`postcss` et `sharp` via Next). La correction automatique proposée imposerait un retour majeur vers Next 9.3.3; elle n’a pas été appliquée. Le déploiement GitHub Pages est un export statique sans serveur Next ni traitement d’image à l’exécution.
+`npm audit --omit=dev` signale trois vulnérabilités élevées transitives dans les outils `postcss` et `sharp` inclus par Next.js. La correction automatique proposée imposerait un retour incompatible vers Next 9.3.3 et n’a donc pas été appliquée. Le site livré est un export statique : aucun serveur Next, traitement PostCSS ou traitement d’image Sharp ne s’exécute en production.
 
 ## Production
 
-La vérification de GitHub Pages et du déploiement Sites sera ajoutée après publication du commit validé.
+Le commit, GitHub Pages, les 31 URL publiques et le QR téléchargé seront vérifiés après la fusion. Le résultat post-déploiement sera ajouté sans modifier les preuves locales ci-dessus.
