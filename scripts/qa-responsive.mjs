@@ -9,6 +9,7 @@ const reportDir = path.resolve(process.env.QA_REPORT_DIR ?? ".qa-responsive");
 const profileDir = path.join(reportDir, "browser-profile");
 const port = 9333;
 const externalBrowser = process.env.QA_EXTERNAL_BROWSER === "1";
+const screenshotsEnabled = process.env.QA_SCREENSHOTS !== "0";
 
 const allRoutes = [
   "/", "/blog/", "/blog/active-directory-role-general/", "/blog/agdpl-explique-simplement/",
@@ -114,6 +115,34 @@ function once(method, timeoutMs = 15000) {
 
 await send("Page.enable");
 await send("Runtime.enable");
+await send("Log.enable");
+await send("Network.enable");
+
+const browserIssues = [];
+const listen = (method, handler) => {
+  const listeners = events.get(method) ?? new Set();
+  listeners.add(handler);
+  events.set(method, listeners);
+};
+listen("Runtime.exceptionThrown", ({ exceptionDetails }) => browserIssues.push({
+  type: "exception",
+  message: exceptionDetails.exception?.description ?? exceptionDetails.text,
+}));
+listen("Runtime.consoleAPICalled", ({ type, args }) => {
+  if (["error", "warning"].includes(type)) browserIssues.push({
+    type: `console.${type}`,
+    message: args.map((arg) => arg.value ?? arg.description ?? "").join(" "),
+  });
+});
+listen("Log.entryAdded", ({ entry }) => {
+  if (["error", "warning"].includes(entry.level)) browserIssues.push({ type: `log.${entry.level}`, message: entry.text, url: entry.url });
+});
+listen("Network.loadingFailed", (entry) => {
+  if (!entry.canceled && ["Document", "Script", "Stylesheet", "Image", "Font"].includes(entry.type)) browserIssues.push({ type: "network.failure", message: entry.errorText, resourceType: entry.type });
+});
+listen("Network.responseReceived", ({ response, type }) => {
+  if (response.status >= 400 && ["Document", "Script", "Stylesheet", "Image", "Font"].includes(type)) browserIssues.push({ type: "network.http", message: `${response.status} ${response.url}`, resourceType: type });
+});
 
 const results = [];
 const progressPath = path.resolve("qa-progress.log");
@@ -123,6 +152,7 @@ for (const viewport of viewports) {
       width: viewport.width, height: viewport.height, deviceScaleFactor: 1, mobile: false,
     });
     for (const route of routes) {
+      browserIssues.length = 0;
       const loaded = once("Page.loadEventFired");
       const navigation = await send("Page.navigate", { url: `${baseUrl}${route}` });
       if (navigation.errorText) throw new Error(`${route}: ${navigation.errorText}`);
@@ -130,6 +160,7 @@ for (const viewport of viewports) {
       await send("Runtime.evaluate", {
         awaitPromise: true,
         expression: `(async () => {
+          document.querySelectorAll('img[loading="lazy"]').forEach((image) => { image.loading = 'eager'; });
           const step = Math.max(320, window.innerHeight - 120);
           const pageHeight = document.documentElement.scrollHeight;
           for (let y = 0; y < pageHeight; y += step) {
@@ -185,6 +216,7 @@ for (const viewport of viewports) {
             imageCount: images.length,
             broken,
             decodeFailures: images.filter((image) => image.complete && image.naturalWidth === 0).map((image) => image.currentSrc || image.src),
+            incompleteImages: images.filter((image) => !image.complete).map((image) => image.currentSrc || image.src || image.getAttribute('src') || '(source vide)'),
             menuInteraction,
             missingAlt: images.filter((image) => !image.hasAttribute('alt')).map((image) => image.currentSrc || image.src),
             overflow: document.documentElement.scrollWidth > window.innerWidth + 2,
@@ -195,12 +227,13 @@ for (const viewport of viewports) {
         })()`,
       });
       const audit = result.value;
+      audit.browserIssues = [...browserIssues];
       results.push({ viewport: viewport.name, route, ...audit });
       await appendFile(progressPath, `${viewport.name} ${route}\n`);
 
-      if (screenshotRoutes.has(route)) {
+      if (screenshotsEnabled && screenshotRoutes.has(route)) {
         const metrics = await send("Page.getLayoutMetrics");
-        const height = Math.min(Math.ceil(metrics.cssContentSize.height), 8000);
+        const height = Math.min(Math.ceil(metrics.cssContentSize.height), 6000);
         const shot = await send("Page.captureScreenshot", {
           format: "png", captureBeyondViewport: true,
           clip: { x: 0, y: 0, width: viewport.width, height, scale: 1 },
@@ -211,10 +244,10 @@ for (const viewport of viewports) {
   }
 }
 
-const failures = results.filter((entry) => entry.broken.length || entry.decodeFailures.length || entry.missingAlt.length || entry.overflow || entry.placeholders.length || !entry.h1 || (entry.menuInteraction && (!entry.menuInteraction.opened || !entry.menuInteraction.closed || !entry.menuInteraction.focusRestored)));
+const failures = results.filter((entry) => entry.broken.length || entry.decodeFailures.length || entry.incompleteImages.length || entry.browserIssues.length || entry.missingAlt.length || entry.overflow || entry.placeholders.length || !entry.h1 || (entry.menuInteraction && (!entry.menuInteraction.opened || !entry.menuInteraction.closed || !entry.menuInteraction.focusRestored)));
 await appendFile(progressPath, `REPORT ${results.length} ${failures.length}\n`);
 await writeFile(path.join(reportDir, "audit.json"), JSON.stringify({ results, failures }, null, 2));
-console.log(JSON.stringify({ pages: routes.length, checks: results.length, screenshots: screenshotRoutes.size * viewports.length, failures }, null, 2));
+console.log(JSON.stringify({ pages: routes.length, checks: results.length, screenshots: screenshotsEnabled ? routes.filter((route) => screenshotRoutes.has(route)).length * viewports.length : 0, failures }, null, 2));
 socket.close();
 browser?.kill();
 if (failures.length) process.exitCode = 1;

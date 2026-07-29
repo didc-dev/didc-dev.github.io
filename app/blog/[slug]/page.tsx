@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { StaticLink as Link } from "../../_components/StaticLink";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { publishedNotes } from "../../_data/notes";

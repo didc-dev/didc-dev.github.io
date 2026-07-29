@@ -1,8 +1,8 @@
-import { readdir, writeFile } from "node:fs/promises";
+import { readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const outputRoot = path.resolve("dist/client");
-const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://didc-dev.github.io").replace(/\/$/, "");
+const siteUrl = "https://didc-dev.github.io";
 
 async function collectRoutes(directory, relative = "") {
   const routes = [];
@@ -14,7 +14,11 @@ async function collectRoutes(directory, relative = "") {
   return routes;
 }
 
-const routes = [...new Set(await collectRoutes(outputRoot))].sort((a, b) => a.localeCompare(b, "fr-CH"));
+const exportedRoutes = [...new Set(await collectRoutes(outputRoot))].sort((a, b) => a.localeCompare(b, "fr-CH"));
+const routes = JSON.parse(await readFile(path.resolve("app/_data/public-routes.json"), "utf8"));
+const unexpected = exportedRoutes.filter((route) => !routes.includes(route));
+const missing = routes.filter((route) => !exportedRoutes.includes(route));
+if (unexpected.length || missing.length) throw new Error(`Manifeste public incohérent. Routes inattendues: ${unexpected.join(", ") || "aucune"}. Routes manquantes: ${missing.join(", ") || "aucune"}.`);
 const sitemap = [
   '<?xml version="1.0" encoding="UTF-8"?>',
   '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',

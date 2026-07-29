@@ -1,5 +1,5 @@
 "use client";
-import Link from "next/link";
+import { StaticLink as Link } from "./StaticLink";
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 const links = [["/", "Accueil"], ["/parcours/", "Parcours"], ["/metiers/", "Métiers"], ["/realisations/", "Réalisations"], ["/formations/", "Formations"], ["/blog/", "Carnet technique"], ["/contact/", "Contact"]];
@@ -22,5 +22,5 @@ export function SiteHeader() {
     document.addEventListener("pointerdown", onPointer);
     return () => { document.body.style.overflow = previousOverflow; background.forEach((element) => { element.inert = false; }); document.removeEventListener("keydown", onKey); document.removeEventListener("pointerdown", onPointer); };
   }, [open]);
-  return <header className="site-header"><div className="nav-shell"><Link className="brand" href="/" onClick={() => close()} aria-label="Daniel Cruz — accueil"><span className="brand-mark">DC</span><span><strong>Daniel Cruz</strong><small>Terrain · planification · technologies</small></span></Link><button ref={buttonRef} className="menu-button" aria-label={open ? "Fermer le menu" : "Ouvrir le menu"} aria-expanded={open} aria-controls="main-nav" onClick={() => setOpen((value) => !value)}><i /><i /><i /></button>{open && <div className="nav-overlay" aria-hidden="true" />}<nav ref={menuRef} id="main-nav" className={open ? "nav-links open" : "nav-links"} aria-label="Navigation principale">{links.map(([href, label]) => { const active = href === "/" ? pathname === "/" : pathname.startsWith(href.slice(0, -1)); return <Link key={href} href={href} className={active ? "active" : ""} aria-current={active ? "page" : undefined} onClick={() => close()}>{label}</Link>; })}</nav></div></header>;
+  return <header className="site-header"><div className="nav-shell"><Link className="brand" href="/" onClick={() => close()}><span className="brand-mark" aria-hidden="true">DC</span><span><strong>Daniel Cruz</strong><small>Terrain · planification · technologies</small></span></Link><button ref={buttonRef} className="menu-button" aria-label={open ? "Fermer le menu" : "Ouvrir le menu"} aria-expanded={open} aria-controls="main-nav" onClick={() => setOpen((value) => !value)}><i /><i /><i /></button>{open && <div className="nav-overlay" aria-hidden="true" />}<nav ref={menuRef} id="main-nav" className={open ? "nav-links open" : "nav-links"} aria-label="Navigation principale">{links.map(([href, label]) => { const active = href === "/" ? pathname === "/" : pathname.startsWith(href.slice(0, -1)); return <Link key={href} href={href} className={active ? "active" : ""} aria-current={active ? "page" : undefined} onClick={() => close()}>{label}</Link>; })}</nav></div></header>;
 }

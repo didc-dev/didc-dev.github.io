@@ -39,3 +39,14 @@ Les résultats de lint, typecheck, tests, build, contrôles visuels et publicati
 - Remplacement de la source AVIF par WebP après constat d’un échec de décodage réel dans un navigateur mobile.
 - Ajout d’un QR code vérifié sur la page Contact et téléchargeable séparément.
 - Extension du contrôle responsive aux formats ordinateur, tablette, téléphone portrait et téléphone paysage.
+
+## 29 juillet 2026 — Finition, disponibilité et validation renforcée
+
+- Remplacement des formulations de poste actuel par une disponibilité immédiate, sans publier de raison de départ.
+- Bornage cohérent des expériences à `2024–2026` et `2021–2026`.
+- Amélioration des cartes cliquables, des filtres, des accordéons, du contraste et de la navigation clavier.
+- Remplacement de la navigation applicative par des liens HTML fiables sur GitHub Pages, sans préchargement `.rsc` en erreur.
+- Minimisation du profil public au nom d’usage `Daniel Cruz`.
+- Manifeste explicite des 31 routes publiques et contrôles SEO exhaustifs.
+- Renforcement de la QA pour détecter images incomplètes, console, exceptions, erreurs réseau et réponses HTTP.
+- Validation finale : 19 tests sur 19, 124 rendus sur 124, Lighthouse accessibilité/bonnes pratiques/SEO à 100 et QR redécodé avec succès.

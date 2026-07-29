@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { StaticLink as Link } from "./StaticLink";
 import { ResponsiveImage } from "./ResponsiveImage";
 
 export function SiteFooter() {

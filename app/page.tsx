@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { StaticLink as Link } from "./_components/StaticLink";
 import { experiences, formations, pillars, projects } from "./_data/content";
 import { ProjectCard } from "./_components/ProjectCard";
 import { HeroPortraitCard } from "./_components/HeroPortraitCard";

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { StaticLink as Link } from "../../_components/StaticLink";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { projects } from "../../_data/content";
@@ -27,7 +27,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         <div>
           <Link className="back-link" href="/realisations/">← Toutes les réalisations</Link>
           <span className="content-type">{project.type}</span>
-          <p className="eyebrow">{project.domain} · {project.year}</p>
+          <p className="eyebrow">{project.domain}{project.year !== project.type ? ` · ${project.year}` : ""}</p>
           <h1>{project.title}</h1>
           <p>{project.summary}</p>
           <div className="tags large">{project.skills.map((skill) => <span key={skill}>{skill}</span>)}</div>
