@@ -35,7 +35,7 @@ const panorama = (base: string, alt: string, position?: string): PortfolioImage 
 });
 
 export const portfolioImages = {
-  header: panorama("header/header_panorama_paysage_technique", "Paysage suisse reliant infrastructures, planification et technologies", "center 48%"),
+  header: panorama("header/header_panorama_paysage_technique", "Paysage alpin avec lac, pêcheur, maisons, drone, barrage et lignes électriques", "60% center"),
   pillarTerrain: horizontal("pillars/pillar_infrastructures_electricite", "Armoires et équipements d’une infrastructure électrique industrielle"),
   pillarPlanification: horizontal("pillars/pillar_planification_coordination", "Plans techniques et outils de coordination électrique"),
   pillarInformatique: horizontal("pillars/pillar_informatique_systemes", "Poste de travail entouré de serveurs et d’équipements réseau"),

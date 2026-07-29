@@ -16,7 +16,7 @@ export default function Home() {
   const selected = ["infrastructures-industrielles", "planification-electrique", "laboratoire-proxmox-ve"].map((slug) => projects.find((project) => project.slug === slug)!);
   return <>
     <section className="hero section-shell" aria-labelledby="hero-title">
-      <ResponsiveImage imageKey="header" className="hero-panorama" sizes="100vw" eager alt="" />
+      <ResponsiveImage imageKey="header" className="hero-panorama" sizes="(max-width: 680px) 100vw, 1180px" eager />
       <div className="hero-copy">
         <p className="eyebrow">Infrastructures industrielles · Planification électrique · Technologies IT</p>
         <h1 id="hero-title">Daniel Cruz</h1>
