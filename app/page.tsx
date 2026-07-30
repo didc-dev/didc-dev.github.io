@@ -4,7 +4,8 @@ import { ProjectCard } from "./_components/ProjectCard";
 import { HeroPortraitCard } from "./_components/HeroPortraitCard";
 import { ResponsiveImage } from "./_components/ResponsiveImage";
 import { pillarImageKeys } from "./_data/images";
-import { pageMetadata } from "./_lib/site";
+import { currentAvailability, profileLocation, recruiterBar } from "./_data/recruiterBar";
+import { assetPath, pageMetadata } from "./_lib/site";
 
 export const metadata = pageMetadata(
   "Daniel Cruz — Infrastructures, planification et technologies",
@@ -16,15 +17,23 @@ export default function Home() {
   const selected = ["infrastructures-industrielles", "planification-electrique", "laboratoire-proxmox-ve"].map((slug) => projects.find((project) => project.slug === slug)!);
   return <>
     <section className="hero section-shell" aria-labelledby="hero-title">
-      <ResponsiveImage imageKey="header" className="hero-panorama" sizes="(max-width: 680px) 100vw, 1180px" eager />
       <div className="hero-copy">
         <p className="eyebrow">Infrastructures industrielles · Planification électrique · Technologies IT</p>
         <h1 id="hero-title">Daniel Cruz</h1>
         <p className="hero-lead">Mon parcours s’est construit entre le terrain, la planification, les infrastructures et l’informatique.</p>
         <p className="hero-note">Ce site rassemble les projets, les expériences et les sujets techniques qui m’accompagnent, tout en gardant une trace claire de ce que j’apprends au fil du temps.</p>
-        <div className="actions"><Link className="button primary" href="/parcours/">Découvrir mon parcours</Link><Link className="button ghost" href="/realisations/">Voir mes réalisations</Link></div>
+        <div className="hero-mobile-context" aria-label={`${profileLocation.publicLabel}. ${currentAvailability.detail}.`}>
+          <span>{profileLocation.short}</span><span>{currentAvailability.detail}</span>
+        </div>
+        <div className="actions hero-actions-desktop"><Link className="button primary" href="/parcours/">Découvrir mon parcours</Link><Link className="button ghost" href="/realisations/">Voir mes réalisations</Link></div>
+        <div className="actions hero-actions-mobile">
+          <Link className="button primary" href="/realisations/">Voir mes réalisations</Link>
+          <a className="button ghost" href={assetPath(recruiterBar.cvPath)} download>Télécharger mon CV</a>
+          <Link className="hero-secondary-link" href="/parcours/">Découvrir mon parcours <span aria-hidden="true">→</span></Link>
+        </div>
       </div>
       <HeroPortraitCard />
+      <ResponsiveImage imageKey="header" className="hero-panorama" sizes="(max-width: 680px) 100vw, 1180px" eager />
     </section>
 
     <section className="section section-shell" aria-labelledby="pillars-title">

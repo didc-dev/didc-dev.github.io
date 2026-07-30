@@ -152,9 +152,11 @@ const results = [];
 const progressPath = path.resolve("qa-progress.log");
 await rm(progressPath, { force: true });
 for (const viewport of viewports) {
+    const mobileViewport = viewport.width <= 680;
     await send("Emulation.setDeviceMetricsOverride", {
-      width: viewport.width, height: viewport.height, deviceScaleFactor: 1, mobile: false,
+      width: viewport.width, height: viewport.height, deviceScaleFactor: 1, mobile: mobileViewport,
     });
+    await send("Emulation.setTouchEmulationEnabled", { enabled: mobileViewport, maxTouchPoints: mobileViewport ? 5 : 1 });
     for (const route of routes) {
       browserIssues.length = 0;
       const loaded = once("Page.loadEventFired");
@@ -229,12 +231,29 @@ for (const viewport of viewports) {
             const hoverStayedClosed = recruiterToggle.getAttribute('aria-expanded') === 'false';
 
             recruiterToggle.click();
-            await new Promise((resolve) => requestAnimationFrame(resolve));
+            await new Promise((resolve) => setTimeout(resolve, 260));
             const panelRect = recruiterPanel.getBoundingClientRect();
             const opened = recruiterToggle.getAttribute('aria-expanded') === 'true'
               && recruiterPanel.getAttribute('aria-hidden') === 'false';
-            const pageScrollable = getComputedStyle(document.body).overflowY !== 'hidden';
-            const panelBounded = panelRect.width <= 380 && panelRect.width < window.innerWidth;
+            const isMobileSheet = window.innerWidth <= 768;
+            const pageScrollStateCorrect = isMobileSheet
+              ? getComputedStyle(document.body).overflow === 'hidden'
+              : getComputedStyle(document.body).overflowY !== 'hidden';
+            const panelBounded = isMobileSheet
+              ? panelRect.width >= window.innerWidth * .88 && panelRect.left >= 0 && panelRect.right <= window.innerWidth
+              : panelRect.width <= 380 && panelRect.width < window.innerWidth;
+            const panelVerticalBounded = panelRect.top >= 0 && panelRect.bottom <= window.innerHeight + 1;
+            const panelScrollable = ['auto', 'scroll'].includes(getComputedStyle(recruiterPanel).overflowY);
+            const panelFocusables = [...recruiterPanel.querySelectorAll('a[href],button:not([disabled]),[tabindex]:not([tabindex="-1"])')];
+            let focusTrapCorrect = true;
+            if (isMobileSheet && panelFocusables.length > 1) {
+              panelFocusables[0].focus();
+              document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true }));
+              const backward = document.activeElement === panelFocusables.at(-1);
+              panelFocusables.at(-1).focus();
+              document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
+              focusTrapCorrect = backward && document.activeElement === panelFocusables[0];
+            }
 
             document.querySelector('.recruiter-permit-card')?.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
             const internalClickKeptOpen = recruiterToggle.getAttribute('aria-expanded') === 'true';
@@ -251,7 +270,9 @@ for (const viewport of viewports) {
 
             recruiterToggle.click();
             await new Promise((resolve) => requestAnimationFrame(resolve));
-            document.querySelector('main')?.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+            const overlay = document.querySelector('.recruiter-overlay');
+            if (isMobileSheet && overlay instanceof HTMLElement) overlay.click();
+            else document.querySelector('main')?.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
             await new Promise((resolve) => requestAnimationFrame(resolve));
             const outsideClosed = recruiterToggle.getAttribute('aria-expanded') === 'false';
             const outsideFocusRestored = document.activeElement === recruiterToggle;
@@ -263,7 +284,7 @@ for (const viewport of viewports) {
             const toggleClosed = recruiterToggle.getAttribute('aria-expanded') === 'false';
 
             recruiterInteraction = {
-              hoverStayedClosed, opened, pageScrollable, panelBounded, internalClickKeptOpen,
+              hoverStayedClosed, opened, pageScrollStateCorrect, panelBounded, panelVerticalBounded, panelScrollable, focusTrapCorrect, internalClickKeptOpen,
               escapeClosed, focusRestored, fixedWhileScrolling, outsideClosed, outsideFocusRestored, toggleClosed,
             };
           }
@@ -280,6 +301,7 @@ for (const viewport of viewports) {
             overflow: document.documentElement.scrollWidth > window.innerWidth + 2,
             scrollWidth: document.documentElement.scrollWidth,
             viewportWidth: window.innerWidth,
+            visualViewport: window.visualViewport ? { width: window.visualViewport.width, height: window.visualViewport.height, offsetTop: window.visualViewport.offsetTop, offsetLeft: window.visualViewport.offsetLeft } : null,
             placeholders: [...document.querySelectorAll('img')].filter((image) => /placeholder/i.test(image.src)).map((image) => image.src),
           };
         })()`,
@@ -288,6 +310,11 @@ for (const viewport of viewports) {
       audit.browserIssues = [...browserIssues];
       results.push({ viewport: viewport.name, route, ...audit });
       await appendFile(progressPath, `${viewport.name} ${route}\n`);
+
+      await send("Runtime.evaluate", {
+        expression: `window.scrollTo(0, 0); if (document.activeElement instanceof HTMLElement) document.activeElement.blur();`,
+      });
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
       if (screenshotsEnabled && screenshotRoutes.has(route)) {
         const metrics = await send("Page.getLayoutMetrics");

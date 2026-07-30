@@ -24,6 +24,7 @@ export function HeroPortraitCard() {
     </div>
 
     <div className="portrait-card-body">
+      <strong className="portrait-mobile-name">Daniel Cruz</strong>
       <div className="availability"><span />Basé à {profileLocation.short}</div>
       <div className="current-role">
         <span className="current-role-label">Disponibilité</span>

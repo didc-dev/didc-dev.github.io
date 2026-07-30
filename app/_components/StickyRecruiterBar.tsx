@@ -14,8 +14,10 @@ import {
 
 export function StickyRecruiterBar() {
   const [open, setOpen] = useState(false);
+  const [mobile, setMobile] = useState(false);
   const pathname = usePathname();
   const dockRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
 
@@ -38,26 +40,55 @@ export function StickyRecruiterBar() {
   }, [pathname]);
 
   useEffect(() => {
+    const media = window.matchMedia("(max-width: 768px)");
+    const sync = () => setMobile(media.matches);
+    sync();
+    media.addEventListener("change", sync);
+    return () => media.removeEventListener("change", sync);
+  }, []);
+
+  useEffect(() => {
     if (!open) return;
+    const previousBodyOverflow = document.body.style.overflow;
+    const previousRootOverflow = document.documentElement.style.overflow;
+    const background = Array.from(document.querySelectorAll<HTMLElement>(".site-header, main, footer"));
+    if (mobile) {
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
+      document.body.classList.add("recruiter-open");
+      background.forEach((element) => { element.inert = true; });
+    }
     const onPointerDown = (event: PointerEvent) => {
       if (!dockRef.current?.contains(event.target as Node)) close();
     };
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") close();
+      if (event.key === "Escape") { close(); return; }
+      if (!mobile || event.key !== "Tab") return;
+      const focusable = Array.from(panelRef.current?.querySelectorAll<HTMLElement>('a[href],button:not([disabled]),[tabindex]:not([tabindex="-1"])') ?? []);
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable.at(-1)!;
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
     };
     document.addEventListener("pointerdown", onPointerDown);
     document.addEventListener("keydown", onKeyDown);
     return () => {
+      document.body.style.overflow = previousBodyOverflow;
+      document.documentElement.style.overflow = previousRootOverflow;
+      document.body.classList.remove("recruiter-open");
+      background.forEach((element) => { element.inert = false; });
       document.removeEventListener("pointerdown", onPointerDown);
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [open]);
+  }, [mobile, open]);
 
   const languageCodes = profileLanguages.map((language) => language.code).join(" · ");
   const languageNames = profileLanguages.map((language) => language.label).join(", ");
 
   return (
     <div ref={dockRef} className={`recruiter-dock${open ? " is-open" : ""}`}>
+      <button className="recruiter-overlay" type="button" aria-label="Fermer les repères professionnels" tabIndex={-1} onClick={() => close()} />
       <button
         ref={triggerRef}
         className="recruiter-toggle"
@@ -68,13 +99,17 @@ export function StickyRecruiterBar() {
         onClick={toggle}
       >
         <span className="recruiter-chevron" aria-hidden="true" />
+        <span className="recruiter-toggle-label">CV &amp; infos recruteur</span>
       </button>
 
       <aside
+        ref={panelRef}
         id="recruiter-panel"
         className="recruiter-panel"
         aria-labelledby="recruiter-title"
         aria-hidden={!open}
+        role={mobile ? "dialog" : undefined}
+        aria-modal={mobile && open ? true : undefined}
       >
         <div className="recruiter-panel-header">
           <div>

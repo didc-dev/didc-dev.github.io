@@ -82,7 +82,7 @@ test("la recherche et les filtres du carnet sont interactifs", async () => {
 
 test("le menu mobile respecte les interactions essentielles", async () => {
   const header = await source("app/_components/SiteHeader.tsx");
-  for (const marker of ["Escape", "pointerdown", "document.body.style.overflow", "aria-expanded", "buttonRef.current?.focus", "usePathname"]) assert.match(header, new RegExp(marker.replace(/[?.]/g, "\\$&")));
+  for (const marker of ["Escape", "Tab", "pointerdown", "document.body.style.overflow", "menu-open", "aria-expanded", "buttonRef.current?.focus", "usePathname", "nav-recruiter-quick", "recruiterBar.cvPath"]) assert.match(header, new RegExp(marker.replace(/[?.]/g, "\\$&")));
 });
 
 test("le contenu public ne contient ni notes internes ni ton de candidature", async () => {
@@ -104,7 +104,7 @@ test("la page d’accueil et le panneau partagent la disponibilité immédiate",
   const page = await html("index.html");
   const visible = page.replace(/<head[\s\S]*?<\/head>/gi, "").replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<[^>]+>/g, " ");
   assert.equal((visible.match(/Disponible pour de nouvelles opportunités/g) ?? []).length, 2);
-  assert.equal((visible.match(/Disponible dès maintenant/g) ?? []).length, 2);
+  assert.equal((visible.match(/Disponible dès maintenant/g) ?? []).length, 4);
   assert.doesNotMatch(visible, /Connect Groupe E · depuis 2024/);
 });
 
@@ -114,7 +114,7 @@ test("la barre recruteur est globale, accessible et se ferme proprement", async 
     source("app/_components/StickyRecruiterBar.tsx"),
   ]);
   assert.match(layout, /<StickyRecruiterBar \/>/);
-  for (const marker of ["aria-expanded", "aria-controls", "Escape", "pointerdown", "usePathname", "triggerRef.current?.focus", "aria-hidden={!open}"]) {
+  for (const marker of ["aria-expanded", "aria-controls", "Escape", "Tab", "pointerdown", "matchMedia", "document.documentElement.style.overflow", "usePathname", "triggerRef.current?.focus", "aria-hidden={!open}", "aria-modal", "recruiter-overlay"]) {
     assert.match(component, new RegExp(marker.replace(/[?.{}!]/g, "\\$&")));
   }
   for (const file of mainRoutes) {
@@ -140,11 +140,14 @@ test("la configuration centralise le statut, le contact et les repères publics"
   assert.match(contact, /profileLanguages/);
 });
 
-test("le CV est téléchargeable uniquement depuis la barre recruteur", async () => {
+test("le CV centralisé est téléchargeable depuis le hero, le menu et la barre recruteur", async () => {
   const page = await html("index.html");
   assert.doesNotMatch(page, /PDF bientôt disponible/);
-  assert.equal(page.match(/href="\/documents\/daniel-cruz-cv\.pdf"/g)?.length, 1);
+  assert.equal(page.match(/href="\/documents\/daniel-cruz-cv\.pdf"/g)?.length, 3);
   assert.match(page, /href="\/documents\/daniel-cruz-cv\.pdf"[^>]*download/);
+  const [home, header] = await Promise.all([source("app/page.tsx"), source("app/_components/SiteHeader.tsx")]);
+  assert.match(home, /recruiterBar\.cvPath/);
+  assert.match(header, /recruiterBar\.cvPath/);
   await access(new URL("public/documents/daniel-cruz-cv.pdf", root));
   await access(new URL("dist/client/documents/daniel-cruz-cv.pdf", root));
 });
@@ -237,6 +240,8 @@ test("les protections responsive et mouvement réduit sont présentes", async ()
   assert.match(css, /\.hero-panorama img \{ object-fit:cover; object-position:center; \}/);
   assert.match(css, /\.hero \.portrait-card \{[^}]*grid-row:1\/3[^}]*margin-top:clamp\(255px,21vw,300px\)/);
   assert.match(css, /@media \(max-width:980px\)[\s\S]*?\.hero \{[^}]*grid-template-columns:minmax\(0,1fr\)/);
-  assert.match(css, /@media \(max-width:680px\)[\s\S]*?\.hero \.portrait-card \{ grid-row:2; \}[\s\S]*?\.hero-copy \{ grid-row:3; \}/);
+  assert.match(css, /@media \(max-width:680px\)[\s\S]*?\.hero-copy \{[^}]*grid-row:1[^}]*\}[\s\S]*?\.hero \.portrait-card \{[^}]*grid-row:2[^}]*min-height:124px[\s\S]*?\.hero-panorama \{[^}]*grid-row:3[^}]*height:clamp\(165px,47vw,195px\)/);
+  assert.match(css, /@media \(max-width:768px\)[\s\S]*?bottom:calc\(\.9rem \+ env\(safe-area-inset-bottom\)\)[\s\S]*?max-height:min\(82dvh,720px\)[\s\S]*?overscroll-behavior:contain/);
+  assert.match(css, /padding-bottom:env\(safe-area-inset-bottom\)/);
   assert.doesNotMatch(css, /\.hero::before \{[^}]*rgba\(246,243,237,\.93\)/);
 });
