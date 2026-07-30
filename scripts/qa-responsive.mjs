@@ -257,6 +257,44 @@ for (const viewport of viewports) {
 
             document.querySelector('.recruiter-permit-card')?.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
             const internalClickKeptOpen = recruiterToggle.getAttribute('aria-expanded') === 'true';
+
+            let pullThresholdKeptOpen = true;
+            let pullIgnoredWhileScrolled = true;
+            let pullDownClosed = true;
+            let pullFocusRestored = true;
+            if (isMobileSheet) {
+              const fireTouch = (type, y, active) => {
+                const event = new Event(type, { bubbles: true, cancelable: true });
+                const point = { clientY: y };
+                Object.defineProperty(event, 'touches', { value: active ? [point] : [] });
+                Object.defineProperty(event, 'changedTouches', { value: [point] });
+                recruiterPanel.dispatchEvent(event);
+              };
+              const pull = async (distance) => {
+                fireTouch('touchstart', 200, true);
+                fireTouch('touchmove', 200 + distance, true);
+                fireTouch('touchend', 200 + distance, false);
+                await new Promise((resolve) => setTimeout(resolve, 50));
+              };
+
+              const maxScroll = recruiterPanel.scrollHeight - recruiterPanel.clientHeight;
+              if (maxScroll > 1) {
+                recruiterPanel.scrollTop = Math.min(40, maxScroll);
+                await pull(90);
+                pullIgnoredWhileScrolled = recruiterToggle.getAttribute('aria-expanded') === 'true';
+              }
+              recruiterPanel.scrollTop = 0;
+              await pull(45);
+              pullThresholdKeptOpen = recruiterToggle.getAttribute('aria-expanded') === 'true';
+              await pull(90);
+              pullDownClosed = recruiterToggle.getAttribute('aria-expanded') === 'false';
+              pullFocusRestored = document.activeElement === recruiterToggle;
+              if (pullDownClosed) {
+                recruiterToggle.click();
+                await new Promise((resolve) => requestAnimationFrame(resolve));
+              }
+            }
+
             document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
             await new Promise((resolve) => requestAnimationFrame(resolve));
             const escapeClosed = recruiterToggle.getAttribute('aria-expanded') === 'false';
@@ -285,6 +323,7 @@ for (const viewport of viewports) {
 
             recruiterInteraction = {
               hoverStayedClosed, opened, pageScrollStateCorrect, panelBounded, panelVerticalBounded, panelScrollable, focusTrapCorrect, internalClickKeptOpen,
+              pullThresholdKeptOpen, pullIgnoredWhileScrolled, pullDownClosed, pullFocusRestored,
               escapeClosed, focusRestored, fixedWhileScrolling, outsideClosed, outsideFocusRestored, toggleClosed,
             };
           }

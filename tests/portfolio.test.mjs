@@ -114,7 +114,7 @@ test("la barre recruteur est globale, accessible et se ferme proprement", async 
     source("app/_components/StickyRecruiterBar.tsx"),
   ]);
   assert.match(layout, /<StickyRecruiterBar \/>/);
-  for (const marker of ["aria-expanded", "aria-controls", "Escape", "Tab", "pointerdown", "matchMedia", "document.documentElement.style.overflow", "usePathname", "triggerRef.current?.focus", "aria-hidden={!open}", "aria-modal", "recruiter-overlay"]) {
+  for (const marker of ["aria-expanded", "aria-controls", "Escape", "Tab", "pointerdown", "matchMedia", "document.documentElement.style.overflow", "usePathname", "triggerRef.current?.focus", "aria-hidden={!open}", "aria-modal", "recruiter-overlay", "onTouchStart", "onTouchMove", "onTouchEnd", "scrollTop", "distance >= 64", "is-pulling"]) {
     assert.match(component, new RegExp(marker.replace(/[?.{}!]/g, "\\$&")));
   }
   for (const file of mainRoutes) {

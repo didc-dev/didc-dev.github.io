@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type TouchEvent as ReactTouchEvent } from "react";
 import { usePathname } from "next/navigation";
 import { assetPath } from "../_lib/site";
 import {
@@ -20,6 +20,15 @@ export function StickyRecruiterBar() {
   const panelRef = useRef<HTMLElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const pullStartYRef = useRef<number | null>(null);
+  const pullCurrentYRef = useRef<number | null>(null);
+
+  const resetPullGesture = () => {
+    pullStartYRef.current = null;
+    pullCurrentYRef.current = null;
+    panelRef.current?.classList.remove("is-pulling");
+    panelRef.current?.style.removeProperty("--recruiter-pull");
+  };
 
   const close = (restoreFocus = true) => {
     setOpen(false);
@@ -32,6 +41,39 @@ export function StickyRecruiterBar() {
       setOpen(true);
       requestAnimationFrame(() => closeRef.current?.focus());
     }
+  };
+
+  const handleTouchStart = (event: ReactTouchEvent<HTMLElement>) => {
+    if (!mobile || !open || event.touches.length !== 1 || (panelRef.current?.scrollTop ?? 0) > 0) {
+      resetPullGesture();
+      return;
+    }
+    pullStartYRef.current = event.touches[0].clientY;
+    pullCurrentYRef.current = event.touches[0].clientY;
+  };
+
+  const handleTouchMove = (event: ReactTouchEvent<HTMLElement>) => {
+    const startY = pullStartYRef.current;
+    if (startY === null || event.touches.length !== 1 || (panelRef.current?.scrollTop ?? 0) > 0) {
+      resetPullGesture();
+      return;
+    }
+    const currentY = event.touches[0].clientY;
+    const distance = currentY - startY;
+    if (distance <= 0) return;
+    pullCurrentYRef.current = currentY;
+    panelRef.current?.classList.add("is-pulling");
+    panelRef.current?.style.setProperty("--recruiter-pull", `${Math.min(distance * 0.55, 96)}px`);
+  };
+
+  const handleTouchEnd = () => {
+    const distance = (pullCurrentYRef.current ?? 0) - (pullStartYRef.current ?? 0);
+    if (pullStartYRef.current !== null && distance >= 64 && (panelRef.current?.scrollTop ?? 0) <= 0) {
+      close();
+      requestAnimationFrame(resetPullGesture);
+      return;
+    }
+    resetPullGesture();
   };
 
   useEffect(() => {
@@ -110,6 +152,10 @@ export function StickyRecruiterBar() {
         aria-hidden={!open}
         role={mobile ? "dialog" : undefined}
         aria-modal={mobile && open ? true : undefined}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={resetPullGesture}
       >
         <div className="recruiter-panel-header">
           <div>
