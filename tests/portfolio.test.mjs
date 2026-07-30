@@ -243,8 +243,8 @@ test("les protections responsive et mouvement réduit sont présentes", async ()
   assert.match(css, /@media \(max-width:680px\)[\s\S]*?\.hero-copy \{[^}]*grid-row:1[^}]*\}[\s\S]*?\.hero \.portrait-card \{[^}]*grid-row:2[^}]*min-height:124px[\s\S]*?\.hero-panorama \{[^}]*grid-row:3[^}]*height:clamp\(165px,47vw,195px\)/);
   assert.match(css, /@media \(max-width:768px\)[\s\S]*?bottom:calc\(\.9rem \+ env\(safe-area-inset-bottom\)\)[\s\S]*?max-height:min\(82dvh,720px\)[\s\S]*?overscroll-behavior:contain/);
   assert.match(css, /padding-bottom:env\(safe-area-inset-bottom\)/);
-  assert.match(css, /\.footer-panorama \{[^}]*opacity:\.92/);
-  assert.match(css, /\.footer-panorama img \{[^}]*filter:brightness\(1\.3\) saturate\(1\.1\)/);
-  assert.match(css, /\.site-footer::before \{[^}]*rgba\(19,35,41,\.34\)/);
+  assert.match(css, /\.footer-panorama \{[^}]*opacity:1/);
+  assert.match(css, /\.footer-panorama img \{[^}]*filter:brightness\(2\.05\) saturate\(1\.2\) contrast\(\.98\)/);
+  assert.match(css, /\.site-footer::before \{[^}]*rgba\(19,35,41,\.1\)/);
   assert.doesNotMatch(css, /\.hero::before \{[^}]*rgba\(246,243,237,\.93\)/);
 });
